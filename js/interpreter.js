@@ -74,15 +74,31 @@ var interpreter = {
 				}
 				interpreter.commands[match[2] + ''] = {
 					type: 'function',
-					reg: new RegExp('^(' + match[2] + ')', 'i')
+					reg: new RegExp('^(' + match[2] + ')', 'i'),
+					commandList: []
 				}
+				interpreter.capture = match[2] + '';
+			}
+		},
+		FIN: {
+			type: 'procedure',
+			reg: /^(FIN)/,
+			doc: '',
+			store: function(match) {
+				interpreter.capture = false
 			}
 		}
 	},
-	buffer: [],
+	commandList: [],
 	store: function(match) {
-		interpreter.buffer[interpreter.buffer.length] = [match[1], match[2]];
+		if (interpreter.capture) {
+			interpreter.commands[interpreter.capture].commandList[interpreter.commandList.length] = [match[1], match[2]]
+		}
+		else {
+			interpreter.commandList[interpreter.commandList.length] = [match[1], match[2]];
+		}
 	},
+	capture: false,
 	run: function(str) {
 		str = trimWhiteSpace(str);
 		for (var i in this.commands) {

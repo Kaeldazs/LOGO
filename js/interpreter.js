@@ -1,13 +1,13 @@
-var interpreter = {
+var itpr = {
 	commands: {
 		AV: {
 			type: 'procedure',
-			reg: /^(AV)\s([0-9])/,
+			reg: /^(AV)\s([0-9]+)/,
 			doc: 'AV pixels //The turtle moves pixels foward'
 		},
 		RE: {
 			type: 'procedure',
-			reg: /^(RE)\s([0-9])/,
+			reg: /^(RE)\s([0-9]+)/,
 			doc: 'RE pixels //The turtle moves pixels backward'
 		},
 		TD: {
@@ -58,7 +58,7 @@ var interpreter = {
 				var iterations = match[1];
 				var commands = match[2];
 				for (var i = 0; i < iterations; i++) {
-					interpreter.run(commands);
+					itpr.run(commands);
 				}
 			}
 		},
@@ -72,12 +72,17 @@ var interpreter = {
 				for (var i in args) {
 					args[i] = args[i].replace(/^\s:/g, '');
 				}
-				interpreter.commands[match[2] + ''] = {
+				itpr.commands[match[2] + ''] = {
 					type: 'function',
 					reg: new RegExp('^(' + match[2] + ')', 'i'),
-					commandList: []
+					buffer: [],
+					store: function() {
+						for (var i = 0; i < this.buffer.length; i++) {
+							itpr.buffer[itpr.buffer.length] = this.buffer[i];
+						}
+					}
 				}
-				interpreter.capture = match[2] + '';
+				itpr.capture = match[2] + '';
 			}
 		},
 		FIN: {
@@ -85,17 +90,17 @@ var interpreter = {
 			reg: /^(FIN)/,
 			doc: '',
 			store: function(match) {
-				interpreter.capture = false
+				itpr.capture = false
 			}
 		}
 	},
-	commandList: [],
+	buffer: [],
 	store: function(match) {
-		if (interpreter.capture) {
-			interpreter.commands[interpreter.capture].commandList[interpreter.commandList.length] = [match[1], match[2]]
+		if (itpr.capture) {
+			itpr.commands[itpr.capture].buffer[itpr.commands[itpr.capture].buffer.length] = [match[1], match[2]]
 		}
 		else {
-			interpreter.commandList[interpreter.commandList.length] = [match[1], match[2]];
+			itpr.buffer[itpr.buffer.length] = [match[1], match[2]];
 		}
 	},
 	capture: false,
@@ -104,10 +109,11 @@ var interpreter = {
 		for (var i in this.commands) {
 			var match = str.match(this.commands[i].reg);
 			if (match) {
-				this.commands[i].store ? this.commands[i].store(match) : interpreter.store(match); 
+				this.commands[i].store ? this.commands[i].store(match) : itpr.store(match); 
 				str = str.replace(match[0], '');
-				interpreter.run(str);
+				itpr.run(str);
 			}
+
 		}
 	}
 }

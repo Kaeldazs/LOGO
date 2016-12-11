@@ -11,7 +11,7 @@ var itpr = {
 		*/
 		AV: {
 			type: 'procedure',
-			reg: /^(AV)\s([0-9]|:[a-zA-Z0-9_$]+)/,
+			reg: /^(AV)\s([0-9]+|:[a-zA-Z0-9_$]+)/,
 			doc: 'AV pixels //The turtle moves pixels foward',
 			duration: 100,
 			exec: function(percent) {
@@ -28,7 +28,7 @@ var itpr = {
 		},
 		RE: {
 			type: 'procedure',
-			reg: /^(RE)\s([0-9]|:[a-zA-Z0-9_$]+)/,
+			reg: /^(RE)\s([0-9]+|:[a-zA-Z0-9_$]+)/,
 			doc: 'RE pixels //The turtle moves pixels backward',
 			duration: 100,
 			exec: function(percent) {
@@ -45,7 +45,7 @@ var itpr = {
 		},
 		TD: {
 			type: 'procedure',
-			reg: /^(TD)\s([0-9]|:[a-zA-Z0-9_$]+)/,
+			reg: /^(TD)\s([0-9]+|:[a-zA-Z0-9_$]+)/,
 			doc: 'TD degrees //The turtle turns degrees to the right',
 			duration: 500,
 			exec: function(percent) {
@@ -62,7 +62,7 @@ var itpr = {
 		},
 		TG: {
 			type: 'procedure',
-			reg: /^(TG)\s([0-9]|:[a-zA-Z0-9_$]+)/,
+			reg: /^(TG)\s([0-9]+|:[a-zA-Z0-9_$]+)/,
 			doc: 'TG degrees //The turtle turns degrees to the left',
 			duration: 500,
 			exec: function(percent) {
@@ -181,25 +181,22 @@ var itpr = {
 		},
 		REPETE: {
 			type: 'structure',
-			reg: /^REPETE\s([0-9]|:[a-zA-Z0-9_$])\s\[([^\]]+)\]/,
+			reg: /^REPETE\s([0-9]+|:[a-zA-Z0-9_$]+)\s\[([^\]]+)\]/,
 			doc: 'REPETE x [commands] //Do the commands x times',
+			duration: 0,
 			store: function(match) {
 				var iterations = match[1];
 				var commands = match[2];
-				for (var i = 0; i < iterations; i++) {
-					itpr.run(commands);
+				if (itpr.capture) {
+					if (itpr.commands[itpr.capture]) {
+						itpr.commands[itpr.capture].buffer[itpr.commands[itpr.capture].buffer.length] = ['REPETE', match[1], match[2]];
+					}
 				}
-			},
-			exec: function(percent) {
-				console.log(
-	    			'Running ' + 
-	    			itpr.buffer[0].instruction 
-	    			+' '+ 
-	    			itpr.buffer[0].args
-	    			+ ' ('+ 
-	    			percent
-	    			+')'
-	    		);
+				else {
+					for (var i = 0; i < iterations; i++) {
+						itpr.run(commands);
+					}
+				}
 			}
 		},
 		POUR: {
@@ -207,39 +204,60 @@ var itpr = {
 			reg: /^(POUR)\s([^\s]+)(?:\s:(?:[a-zA-Z0-9_$]+))*/,
 			doc: '',
 			store: function(match) {
-				var argsRegex = /(\s:([a-zA-Z0-9_$]+))/g;
-				var args = match[0].match(argsRegex);
-				var regVar = '(?:'+ match[2] +')';
-				var regFunction = '^(' + match[2] + ')';
-				for (var i in args) {
-					args[i] = args[i].replace(/^\s/g, '');
+				if (!itpr.capture) {
+					var argsRegex = /(\s:([a-zA-Z0-9_$]+))/g;
+					var args = match[0].match(argsRegex);
+					var regVar = '(?:'+ match[2] +')';
+					var regFunction = '^(' + match[2] + ')';
+					for (var i in args) {
+						args[i] = args[i].replace(/^\s/g, '');
 
-					regVar += '(?:\\\s(\\\d+))';
-					regFunction += '(?:\\\s(\\\d+))';
-				}
-				itpr.commands[match[2] + ''] = {
-					type: 'function',
-					reg: new RegExp(regFunction),
-					buffer: [],
-					localVar: args,
-					store: function(match) {
-						var i;
-						for (i = 0; i < this.buffer.length; i++) {
-							var argsStr = this.buffer[i][1];
-							for (var j = 0; j < this.localVar.length; j++) {
-								var r = new RegExp('^'+ this.localVar[j] +'$', 'g')
-								argsStr = argsStr.replace(r, match[j + 2]);
-							}
-							itpr.buffer[itpr.buffer.length] = {
-								instruction: this.buffer[i][0],
-								args: argsStr,
-								start: undefined
-							};
-						}
-						animLoop.play();
+						regVar += '(?:\\\s(\\\d+))';
+						regFunction += '(?:\\\s(\\\d+))';
 					}
+					itpr.commands[match[2] + ''] = {
+						type: 'function',
+						reg: new RegExp(regFunction),
+						buffer: [],
+						localVar: args,
+						store: function(match) {
+							var i;
+							for (i = 0; i < this.buffer.length; i++) {
+								if (this.buffer[i][0] == 'REPETE') {
+									var tmp = this.buffer[i][2];
+									var iteration = this.buffer[i][1];
+									for (var j = 0; j < this.localVar.length; j++) {
+										var r = new RegExp(' ' + this.localVar[j] + '$', 'g');
+										tmp = tmp.replace(r, ' ' + match[j + 2]);
+										r = new RegExp('^' + this.localVar[j] + '$', 'g');
+										iteration = iteration.replace(r, match[j + 2]);
+										r = new RegExp(' ' + this.localVar[j] + ' ', 'g');
+										tmp = tmp.replace(r, ' ' + match[j + 2] + ' ');
+									}
+									console.log(iteration);
+									for (var k = 0; k < iteration; k++) {
+										console.log('run')
+										itpr.run(tmp);
+									}
+								}
+								else {
+									var argsStr = this.buffer[i][1];
+									for (var j = 0; j < this.localVar.length; j++) {
+										var r = new RegExp('^'+ this.localVar[j] +'$', 'g')
+										argsStr = argsStr.replace(r, match[j + 2]);
+									}
+									itpr.buffer[itpr.buffer.length] = {
+										instruction: this.buffer[i][0],
+										args: argsStr,
+										start: undefined
+									};
+								}
+							}
+							animLoop.play();
+						}
+					}
+					itpr.capture = match[2] + '';
 				}
-				itpr.capture = match[2] + '';
 			}
 		},
 		FIN: {

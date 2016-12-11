@@ -33,12 +33,13 @@ var animLoop = Kaylee.add(function() {
 
     	// if instruction is curently running
     	else {
-    		itpr.commands[itpr.buffer[0].instruction].exec(((time-itpr.buffer[0].start)/itpr.buffer[0].duration));
+    		var percent = ((time-itpr.buffer[0].start)/itpr.buffer[0].duration);
+    		if (percent) itpr.commands[itpr.buffer[0].instruction].exec(percent);
     	}
     }
     // if buffer is empty
     else {
-    	console.log('Buffer is empty');
+    	console.log('Buffer is empty, animation is paused');
     	// stop animation loop
     	animLoop.pause();
     }

@@ -234,9 +234,7 @@ var itpr = {
 										r = new RegExp(' ' + this.localVar[j] + ' ', 'g');
 										tmp = tmp.replace(r, ' ' + match[j + 2] + ' ');
 									}
-									console.log(iteration);
 									for (var k = 0; k < iteration; k++) {
-										console.log('run')
 										itpr.run(tmp);
 									}
 								}

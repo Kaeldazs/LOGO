@@ -1,83 +1,182 @@
 var itpr = {
+	// commands list
 	commands: {
+		/*
+			type: type of command (for syntaxic coloration),
+			reg: RegExp for find this command,
+			doc: documentation
+			duration: animation duration
+			exec: what append when execute this command,
+			store: what append when storing this command on buffer
+		*/
 		AV: {
 			type: 'procedure',
 			reg: /^(AV)\s([0-9]|:[a-zA-Z0-9_$]+)/,
 			doc: 'AV pixels //The turtle moves pixels foward',
-			exec: function() {
-				//
+			duration: 100,
+			exec: function(percent) {
+				console.log(
+	    			'Running ' +
+	    			itpr.buffer[0].instruction 
+	    			+' '+ 
+	    			itpr.buffer[0].args
+	    			+ ' ('+ 
+	    			percent
+	    			+')'
+	    		);
 			}
 		},
 		RE: {
 			type: 'procedure',
 			reg: /^(RE)\s([0-9]|:[a-zA-Z0-9_$]+)/,
 			doc: 'RE pixels //The turtle moves pixels backward',
-			exec: function() {
-				//
+			duration: 100,
+			exec: function(percent) {
+				console.log(
+	    			'Running ' +
+	    			itpr.buffer[0].instruction 
+	    			+' '+ 
+	    			itpr.buffer[0].args
+	    			+ ' ('+ 
+	    			percent
+	    			+')'
+	    		);
 			}
 		},
 		TD: {
 			type: 'procedure',
 			reg: /^(TD)\s([0-9]|:[a-zA-Z0-9_$]+)/,
 			doc: 'TD degrees //The turtle turns degrees to the right',
-			exec: function() {
-				//
+			duration: 500,
+			exec: function(percent) {
+				console.log(
+	    			'Running ' + 
+	    			itpr.buffer[0].instruction 
+	    			+' '+ 
+	    			itpr.buffer[0].args
+	    			+ ' ('+ 
+	    			percent
+	    			+')'
+	    		);
 			}
 		},
 		TG: {
 			type: 'procedure',
 			reg: /^(TG)\s([0-9]|:[a-zA-Z0-9_$]+)/,
 			doc: 'TG degrees //The turtle turns degrees to the left',
-			exec: function() {
-				//
+			duration: 500,
+			exec: function(percent) {
+				console.log(
+	    			'Running ' + 
+	    			itpr.buffer[0].instruction 
+	    			+' '+ 
+	    			itpr.buffer[0].args
+	    			+ ' ('+ 
+	    			percent
+	    			+')'
+	    		);
 			}
 		},
 		FCC: {
 			type: 'procedure',
 			reg: /^(FCC)\s(#([[:xdigit:]]{6}|[[:xdigit:]]{3}))/,
 			doc: 'FCC color //Change the trace color to color in RGB format as #FF0000 for red',
-			exec: function() {
-				//
+			duration: 500,
+			exec: function(percent) {
+				console.log(
+	    			'Running ' + 
+	    			itpr.buffer[0].instruction 
+	    			+' '+ 
+	    			itpr.buffer[0].args
+	    			+ ' ('+ 
+	    			percent
+	    			+')'
+	    		);
 			}
 		},
 		LC: {
 			type: 'procedure',
 			reg: /^(LC)/,
 			doc: 'LC //Pen up (no trace)',
-			exec: function() {
-				//
+			duration: 500,
+			exec: function(percent) {
+				console.log(
+	    			'Running ' + 
+	    			itpr.buffer[0].instruction 
+	    			+' '+ 
+	    			itpr.buffer[0].args
+	    			+ ' ('+ 
+	    			percent
+	    			+')'
+	    		);
 			}
 		},
 		BC: {
 			type: 'procedure',
 			reg: /^(BC)/,
 			doc: 'BC //Pen down (trace active)',
-			exec: function() {
-				//
+			duration: 500,
+			exec: function(percent) {
+				console.log(
+	    			'Running ' + 
+	    			itpr.buffer[0].instruction 
+	    			+' '+ 
+	    			itpr.buffer[0].args
+	    			+ ' ('+ 
+	    			percent
+	    			+')'
+	    		);
 			}
 		},
 		VE: {
 			type: 'procedure',
 			reg: /^(VE)/,
 			doc: 'VE //Clears the screen and put the turtle at the center, facing upwards',
-			exec: function() {
-				//
+			duration: 500,
+			exec: function(percent) {
+				console.log(
+	    			'Running ' + 
+	    			itpr.buffer[0].instruction 
+	    			+' '+ 
+	    			itpr.buffer[0].args
+	    			+ ' ('+ 
+	    			percent
+	    			+')'
+	    		);
 			}
 		},
 		CT: {
 			type: 'procedure',
 			reg: /^(CT)/,
 			doc: 'CT //Hide the turtle',
-			exec: function() {
-				//
+			duration: 500,
+			exec: function(percent) {
+				console.log(
+	    			'Running ' + 
+	    			itpr.buffer[0].instruction 
+	    			+' '+ 
+	    			itpr.buffer[0].args
+	    			+ ' ('+ 
+	    			percent
+	    			+')'
+	    		);
 			}
 		},
 		MT: {
 			type: 'procedure',
 			reg: /^(MT)/,
 			doc: 'MT //Show the turtle',
-			exec: function() {
-				//
+			duration: 500,
+			exec: function(percent) {
+				console.log(
+	    			'Running ' + 
+	    			itpr.buffer[0].instruction 
+	    			+' '+ 
+	    			itpr.buffer[0].args
+	    			+ ' ('+ 
+	    			percent
+	    			+')'
+	    		);
 			}
 		},
 		REPETE: {
@@ -91,8 +190,16 @@ var itpr = {
 					itpr.run(commands);
 				}
 			},
-			exec: function() {
-				//
+			exec: function(percent) {
+				console.log(
+	    			'Running ' + 
+	    			itpr.buffer[0].instruction 
+	    			+' '+ 
+	    			itpr.buffer[0].args
+	    			+ ' ('+ 
+	    			percent
+	    			+')'
+	    		);
 			}
 		},
 		POUR: {
@@ -123,8 +230,13 @@ var itpr = {
 								var r = new RegExp('^'+ this.localVar[j] +'$', 'g')
 								argsStr = argsStr.replace(r, match[j + 2]);
 							}
-							itpr.buffer[itpr.buffer.length] = [this.buffer[i][0], argsStr];
+							itpr.buffer[itpr.buffer.length] = {
+								instruction: this.buffer[i][0],
+								args: argsStr,
+								start: undefined
+							};
 						}
+						animLoop.play();
 					}
 				}
 				itpr.capture = match[2] + '';
@@ -136,9 +248,6 @@ var itpr = {
 			doc: 'FIN //End of capture',
 			store: function(match) {
 				itpr.capture = false
-			},
-			exec: function() {
-				//
 			}
 		}
 	},
@@ -150,13 +259,25 @@ var itpr = {
 			}
 		}
 		else {
-			itpr.buffer[itpr.buffer.length] = [match[1], match[2]];
+			itpr.buffer[itpr.buffer.length] = {
+				instruction: match[1],
+				args: match[2],
+				start: undefined
+			};
+
+			// launch animation loop
+			animLoop.play();
 		}
 	},
+	// reset buffer
 	clear: function() {
 		itpr.buffer = [];
 	},
+
+	// which command is capturing user input
 	capture: false,
+
+	// interprete a string input
 	run: function(str) {
 		str = trimWhiteSpace(str);
 		for (var i in this.commands) {

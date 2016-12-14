@@ -1,9 +1,26 @@
+var turtle = {
+    x: 0,
+    currentMoveX: 0,
+    y: 0,
+    currentMoveY: 0,
+    a: 45,
+    currentMoveA: 0,
+    getPos: function() {
+        return [
+            turtle.x + turtle.currentMoveX, 
+            turtle.y + turtle.currentMoveY, 
+            turtle.a + turtle.currentMoveA
+        ];
+    }
+};
+
 // rendered instructions
 var rI = [];
 
 // render function
 var render = function() {
     canvas.clear();
+    draw.turtle();
 };
 
 // animation loop
@@ -25,15 +42,14 @@ var animLoop = Kaylee.add(function() {
     		itpr.buffer[0].start = undefined;
     		rI[rI.length] = itpr.buffer[0];
     		itpr.buffer.shift();
-
-    		if (itpr.buffer[0]) {
-    			console.log('Shift buffer, next is ' + itpr.buffer[0].instruction + ' '+ itpr.buffer[0].args);
-    		}
     	}
 
     	// if instruction is curently running
     	else {
     		var percent = ((time-itpr.buffer[0].start)/itpr.buffer[0].duration);
+            if (Kaylee.easing[itpr.commands[itpr.buffer[0].instruction].easing]) {
+                percent = Kaylee.easing[itpr.commands[itpr.buffer[0].instruction].easing](percent, 0, 1, 1);
+            }
     		if (percent) itpr.commands[itpr.buffer[0].instruction].exec(percent);
     	}
     }
@@ -55,4 +71,5 @@ var animLoop = Kaylee.add(function() {
 	// generate a new canvas object
 	canvas = new Canvas();
     canvas.create();
+    draw.turtle();
 })();

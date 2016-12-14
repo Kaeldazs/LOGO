@@ -3,6 +3,8 @@ var Canvas = function() {
     this.ctx     = undefined,
     this.h       = undefined,
     this.w       = undefined,
+    this.cx      = undefined,
+    this.cy      = undefined,
     this.pxRatio = window.devicePixelRatio || 1;
     var _this    = this;
 
@@ -17,6 +19,8 @@ var Canvas = function() {
         _this.el.style.height = window.innerHeight + 'px';
         _this.el.width = _this.w;
         _this.el.height = _this.h;
+        _this.cx =  Math.round(_this.w/2);
+        _this.cy =  Math.round(_this.h/2);
 
         // append canvas on body
         document.body.appendChild(_this.el);

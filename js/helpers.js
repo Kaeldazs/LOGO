@@ -1,37 +1,13 @@
-events = {
-	create: function(name, element, event, handler) {
-		this.list[name] = [element, event, handler];
-	},
-	add: function(names) {
-		var name = names.split(' ');
-		for (var j = 0; j < name.length; j++) {
-			arr = _.events.list[name[j]];
-			var event = arr[1].split(' ');
-			for (var i = 0; i < event.length; i++) {
-				if (document.addEventListener) {
-					arr[0].addEventListener(event[i], arr[2], false);
-				}
-				else {
-					arr[0].attachEvent('on' + event[i], arr[2]);
-				}
-			}
-		}
-	},
-	remove: function(names) {
-		var name = names.split(' ');
-		for (var j = 0; j < name.length; j++) {
-			var arr = _.events.list[name[j]];
-			var event = arr[1].split(' ');
-			for (var i = 0; i < event.length; i++) {
-				if (document.addEventListener) {
-					arr[0].removeEventListener(event[i], arr[2], false);
-				}
-				else {
-					arr[0].detachEvent('on' + event[i], arr[2]);
-				}
-			}
-		}
-	}
+Math.rotate = function(cx, cy, x, y, angle) {
+    var radians = (Math.PI / 180) * -angle,
+        cos = Math.cos(radians),
+        sin = Math.sin(radians),
+        nx = (cos * (x - cx)) + (sin * (y - cy)) + cx,
+        ny = (cos * (y - cy)) - (sin * (x - cx)) + cy;
+    return {
+        'x': nx,
+        'y': ny
+    };
 };
 
 function trimWhiteSpace(str) {

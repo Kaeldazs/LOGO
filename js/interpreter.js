@@ -13,51 +13,59 @@ var itpr = {
 			type: 'procedure',
 			reg: /^(AV)\s([0-9]+|:[a-zA-Z0-9_$]+)/,
 			doc: 'AV pixels //The turtle moves pixels foward',
-			duration: 100,
+			duration: 400,
+			easing: 'ease',
 			exec: function(percent) {
-				console.log(
-	    			'Running ' +
-	    			itpr.buffer[0].instruction 
-	    			+' '+ 
-	    			itpr.buffer[0].args
-	    			+ ' ('+ 
-	    			percent
-	    			+')'
-	    		);
+				var move = itpr.buffer[0].args * percent;
+				var newPos = Math.rotate(0, 0, 0, -move, turtle.a);
+				if (percent == 1) {
+					turtle.currentMoveX = 0;
+					turtle.currentMoveY = 0;
+					turtle.x += newPos.x;
+					turtle.y += newPos.y;
+				}
+				else {
+					turtle.currentMoveX = newPos.x;
+					turtle.currentMoveY = newPos.y;
+				}
 			}
 		},
 		RE: {
 			type: 'procedure',
 			reg: /^(RE)\s([0-9]+|:[a-zA-Z0-9_$]+)/,
 			doc: 'RE pixels //The turtle moves pixels backward',
-			duration: 100,
+			duration: 400,
+			easing: 'ease',
 			exec: function(percent) {
-				console.log(
-	    			'Running ' +
-	    			itpr.buffer[0].instruction 
-	    			+' '+ 
-	    			itpr.buffer[0].args
-	    			+ ' ('+ 
-	    			percent
-	    			+')'
-	    		);
+				var move = itpr.buffer[0].args * percent;
+				var newPos = Math.rotate(0, 0, 0, move, turtle.a);
+				if (percent == 1) {
+					turtle.currentMoveX = 0;
+					turtle.currentMoveY = 0;
+					turtle.x += newPos.x;
+					turtle.y += newPos.y;
+				}
+				else {
+					turtle.currentMoveX = newPos.x;
+					turtle.currentMoveY = newPos.y;
+				}
 			}
 		},
 		TD: {
 			type: 'procedure',
 			reg: /^(TD)\s([0-9]+|:[a-zA-Z0-9_$]+)/,
 			doc: 'TD degrees //The turtle turns degrees to the right',
-			duration: 500,
+			duration: 400,
+			easing: 'ease',
 			exec: function(percent) {
-				console.log(
-	    			'Running ' + 
-	    			itpr.buffer[0].instruction 
-	    			+' '+ 
-	    			itpr.buffer[0].args
-	    			+ ' ('+ 
-	    			percent
-	    			+')'
-	    		);
+				var move = itpr.buffer[0].args * percent;
+				if (percent == 1) {
+					turtle.currentMoveA = 0;
+					turtle.a += move;
+				}
+				else {
+					turtle.currentMoveA = move;
+				}
 			}
 		},
 		TG: {

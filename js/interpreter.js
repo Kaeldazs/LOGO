@@ -12,34 +12,51 @@ var itpr = {
 		AV: {
 			type: 'procedure',
 			reg: /^(AV)\s([0-9]+|:[a-zA-Z0-9_$]+)/,
-			doc: 'AV pixels //The turtle moves pixels foward',
-			duration: 400,
+			doc: 'AV pixels // The turtle moves pixels foward',
+			duration: 300,
 			easing: 'ease',
 			exec: function(percent) {
 				var move = itpr.buffer[0].args * percent;
 				var newPos = Math.rotate(0, 0, 0, -move, turtle.a);
 				if (percent == 1) {
+
+					var newPosX = turtle.x + newPos.x,
+						newPosY = turtle.y + newPos.y;
+
+					if (turtle.draw) {
+						draw.line(canvasDraw, turtle.x, turtle.y, newPosX, newPosY);
+					}
 					turtle.currentMoveX = 0;
 					turtle.currentMoveY = 0;
-					turtle.x += newPos.x;
-					turtle.y += newPos.y;
+					turtle.x = newPosX;
+					turtle.y = newPosY;
 				}
 				else {
 					turtle.currentMoveX = newPos.x;
 					turtle.currentMoveY = newPos.y;
+					if (turtle.draw) {
+						draw.line(canvasTurtle, turtle.x, turtle.y, turtle.x + turtle.currentMoveX, turtle.y + turtle.currentMoveY);
+					}
 				}
 			}
 		},
 		RE: {
 			type: 'procedure',
 			reg: /^(RE)\s([0-9]+|:[a-zA-Z0-9_$]+)/,
-			doc: 'RE pixels //The turtle moves pixels backward',
-			duration: 400,
+			doc: 'RE pixels // The turtle moves pixels backward',
+			duration: 300,
 			easing: 'ease',
 			exec: function(percent) {
 				var move = itpr.buffer[0].args * percent;
 				var newPos = Math.rotate(0, 0, 0, move, turtle.a);
 				if (percent == 1) {
+
+					var newPosX = turtle.x + newPos.x,
+						newPosY = turtle.y + newPos.y;
+
+					if (turtle.draw) {
+						draw.line(canvasDraw, turtle.x, turtle.y, newPosX, newPosY);
+					}
 					turtle.currentMoveX = 0;
 					turtle.currentMoveY = 0;
 					turtle.x += newPos.x;
@@ -48,14 +65,17 @@ var itpr = {
 				else {
 					turtle.currentMoveX = newPos.x;
 					turtle.currentMoveY = newPos.y;
+					if (turtle.draw) {
+						draw.line(canvasTurtle, turtle.x, turtle.y, turtle.x + turtle.currentMoveX, turtle.y + turtle.currentMoveY);
+					}
 				}
 			}
 		},
 		TD: {
 			type: 'procedure',
 			reg: /^(TD)\s([0-9]+|:[a-zA-Z0-9_$]+)/,
-			doc: 'TD degrees //The turtle turns degrees to the right',
-			duration: 400,
+			doc: 'TD degrees // The turtle turns degrees to the right',
+			duration: 300,
 			easing: 'ease',
 			exec: function(percent) {
 				var move = itpr.buffer[0].args * percent;
@@ -71,76 +91,47 @@ var itpr = {
 		TG: {
 			type: 'procedure',
 			reg: /^(TG)\s([0-9]+|:[a-zA-Z0-9_$]+)/,
-			doc: 'TG degrees //The turtle turns degrees to the left',
-			duration: 500,
+			doc: 'TG degrees // The turtle turns degrees to the left',
+			duration: 300,
 			exec: function(percent) {
-				console.log(
-	    			'Running ' + 
-	    			itpr.buffer[0].instruction 
-	    			+' '+ 
-	    			itpr.buffer[0].args
-	    			+ ' ('+ 
-	    			percent
-	    			+')'
-	    		);
+				var move = -itpr.buffer[0].args * percent;
+				if (percent == 1) {
+					turtle.currentMoveA = 0;
+					turtle.a += move;
+				}
+				else {
+					turtle.currentMoveA = move;
+				}
 			}
 		},
 		FCC: {
 			type: 'procedure',
-			reg: /^(FCC)\s(#([[:xdigit:]]{6}|[[:xdigit:]]{3}))/,
-			doc: 'FCC color //Change the trace color to color in RGB format as #FF0000 for red',
-			duration: 500,
-			exec: function(percent) {
-				console.log(
-	    			'Running ' + 
-	    			itpr.buffer[0].instruction 
-	    			+' '+ 
-	    			itpr.buffer[0].args
-	    			+ ' ('+ 
-	    			percent
-	    			+')'
-	    		);
+			reg: /^(FCC)\s(#([[0-9A-Fa-f]{6}|[[0-9A-Fa-f]{3}))/,
+			doc: 'FCC color // Change the trace color to color in RGB format as #FF0000 for red',
+			exec: function() {
+				turtle.colorLine = itpr.buffer[0].args;
 			}
 		},
 		LC: {
 			type: 'procedure',
 			reg: /^(LC)/,
-			doc: 'LC //Pen up (no trace)',
-			duration: 500,
-			exec: function(percent) {
-				console.log(
-	    			'Running ' + 
-	    			itpr.buffer[0].instruction 
-	    			+' '+ 
-	    			itpr.buffer[0].args
-	    			+ ' ('+ 
-	    			percent
-	    			+')'
-	    		);
+			doc: 'LC // Pen up (no trace)',
+			exec: function() {
+				turtle.draw = false;
 			}
 		},
 		BC: {
 			type: 'procedure',
 			reg: /^(BC)/,
-			doc: 'BC //Pen down (trace active)',
-			duration: 500,
-			exec: function(percent) {
-				console.log(
-	    			'Running ' + 
-	    			itpr.buffer[0].instruction 
-	    			+' '+ 
-	    			itpr.buffer[0].args
-	    			+ ' ('+ 
-	    			percent
-	    			+')'
-	    		);
+			doc: 'BC // Pen down (trace active)',
+			exec: function() {
+				turtle.draw = true;
 			}
 		},
 		VE: {
 			type: 'procedure',
 			reg: /^(VE)/,
-			doc: 'VE //Clears the screen and put the turtle at the center, facing upwards',
-			duration: 500,
+			doc: 'VE // Clears the screen and put the turtle at the center, facing upwards',
 			exec: function(percent) {
 				console.log(
 	    			'Running ' + 
@@ -156,42 +147,35 @@ var itpr = {
 		CT: {
 			type: 'procedure',
 			reg: /^(CT)/,
-			doc: 'CT //Hide the turtle',
+			doc: 'CT // Hide the turtle',
 			duration: 500,
 			exec: function(percent) {
-				console.log(
-	    			'Running ' + 
-	    			itpr.buffer[0].instruction 
-	    			+' '+ 
-	    			itpr.buffer[0].args
-	    			+ ' ('+ 
-	    			percent
-	    			+')'
-	    		);
+				if (percent == 1) {
+					turtle.opacity = 0;
+				}
+				else {
+					turtle.opacity = 1 - percent;
+				}
 			}
 		},
 		MT: {
 			type: 'procedure',
 			reg: /^(MT)/,
-			doc: 'MT //Show the turtle',
+			doc: 'MT // Show the turtle',
 			duration: 500,
 			exec: function(percent) {
-				console.log(
-	    			'Running ' + 
-	    			itpr.buffer[0].instruction 
-	    			+' '+ 
-	    			itpr.buffer[0].args
-	    			+ ' ('+ 
-	    			percent
-	    			+')'
-	    		);
+				if (percent == 1) {
+					turtle.opacity = 1;
+				}
+				else {
+					turtle.opacity = percent;
+				}
 			}
 		},
 		REPETE: {
 			type: 'structure',
 			reg: /^REPETE\s([0-9]+|:[a-zA-Z0-9_$]+)\s\[([^\]]+)\]/,
-			doc: 'REPETE x [commands] //Do the commands x times',
-			duration: 0,
+			doc: 'REPETE x [commands] // Do the commands x times',
 			store: function(match) {
 				var iterations = match[1];
 				var commands = match[2];
@@ -269,7 +253,7 @@ var itpr = {
 		FIN: {
 			type: 'procedure',
 			reg: /^(FIN)/,
-			doc: 'FIN //End of capture',
+			doc: 'FIN // End of capture',
 			store: function(match) {
 				itpr.capture = false
 			}

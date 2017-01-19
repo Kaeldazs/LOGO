@@ -1,9 +1,14 @@
+// turtle properties
 var turtle = {
     x: 0,
     currentMoveX: 0,
     y: 0,
     currentMoveY: 0,
-    a: 45,
+    a: 0,
+    opacity: 1,
+    draw: true,
+    visible: true,
+    colorLine: '#FFFFFF',
     currentMoveA: 0,
     getPos: function() {
         return [
@@ -17,14 +22,12 @@ var turtle = {
 // rendered instructions
 var rI = [];
 
-// render function
-var render = function() {
-    canvas.clear();
-    draw.turtle();
-};
-
 // animation loop
-var animLoop = Kaylee.add(function() {
+var animLoop = Kaylee.prepare(function() {
+
+    // clear canvas
+    canvasTurtle.clear();
+
 	// if instruction in buffer
     if (itpr.buffer.length > 0) {
     	time = Date.now();
@@ -33,6 +36,7 @@ var animLoop = Kaylee.add(function() {
 
     	// if duration is unset
     	if (!itpr.buffer[0].duration) itpr.buffer[0].duration = itpr.commands[itpr.buffer[0].instruction].duration;
+        if (!itpr.buffer[0].duration) itpr.buffer[0].duration = 0;
 
     	// if instruction is running for the last time
     	if (time >= itpr.buffer[0].start + itpr.buffer[0].duration) {
@@ -55,21 +59,30 @@ var animLoop = Kaylee.add(function() {
     }
     // if buffer is empty
     else {
-    	console.log('Buffer is empty, animation is paused');
     	// stop animation loop
     	animLoop.pause();
     }
-
-    // draw rendered instructions
-    render();
-}, {
-	// prepare animation loop without running it
-    prepare: true
+    // draw turtle
+    draw.turtle(canvasTurtle);
 });
 
 (function() {
-	// generate a new canvas object
-	canvas = new Canvas();
-    canvas.create();
-    draw.turtle();
+	// generate a new canvas objects
+
+    // canvas: draw
+    canvasDraw = new Canvas();
+    canvasDraw.create();
+
+    // canvas: turtle && temporary draw
+	canvasTurtle = new Canvas();
+    canvasTurtle.create();
+
+    // draw turtle
+    draw.turtle(canvasTurtle);
 })();
+
+function test() {
+    var cmd =  'POUR CIRCLE :size REPETE 10 [FCC #000 AV :size TD 18 FCC #FFF AV :size TD 18] FIN POUR STAR :size REPETE 8 [AV :size TD 135] FIN LC RE 60 TG 90 AV 60 TD 90 BC FCC #000 STAR 200 LC AV 10 TD 90 AV 20 TG 90 BC FCC #CCC CT STAR 180 LC AV 90 TG 90 MT AV 75 TD 90 RE 17 BC CIRCLE 34 LC AV 17 TD 90 AV 110';
+
+    itpr.run(cmd);
+}

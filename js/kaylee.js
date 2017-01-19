@@ -11,6 +11,7 @@ Kaylee = {
 	run: false,
 	inc: 0,
 	easing: {
+		// t: temps actuel, b: valeur de départ, c: valeur finale, d: durée
 		linear: function(t, b, c, d) {
 			return (c-b)/d*t;
 		},
@@ -160,15 +161,22 @@ Kaylee = {
 		return nb;
 	},
 	prepare: function(elem, args, duration, options) {
+		if (typeof elem == "function") {
+			if (!args) args = {};
+			args.prepare = true;
+			return Kaylee.add(elem, args);
+		}
 		if (!options) options = {};
 		options.prepare = true;
 		if (!options.id) {
 			options.id = 'Kaylee-' + (this.inc++);
 		}
+		elem = window.jQuery && elem instanceof jQuery ? elem[0] : elem;
 		Kaylee.animate(elem, args, duration, options);
 		return this.instance(options.id);
 	},
 	animate: function(elem, args, duration, options) {
+		if (typeof elem == "function") return Kaylee.add(elem, args);
 		if (!options) options = {};
 		if (elem.length === undefined) {
 			elem = [elem];
@@ -319,9 +327,9 @@ Kaylee = {
 		};
 		
 		this.add(anim, {
+			duration: duration,
 			id: options.id,
 			prepare: options.prepare,
-			duration: duration,
 			callback: function() {
 				end();
 				if (options.callback) options.callback();
@@ -341,7 +349,7 @@ Kaylee = {
 		if (id) {
 			for (var i = 0; i < this.running.length; i++) {
 				if (this.running[i].id == id) {
-					this.running[i].pause = Date.now();
+					this.running[i].p = Date.now();
 					this.paused[this.paused.length] = this.running[i];
 					this.rmFromArr(this.running, i);
 					return true;
@@ -398,26 +406,19 @@ Kaylee = {
 	},
 	add: function(func, args) {
 		if (!args) args = {};
-		var start, pause, duration;
-        if (args.duration) {
-            duration = args.duration;
-        }
-		if (args.prepare) {
-			start = pause = Date.now();
-		}
+		var start = Date.now(), pause;
+		if (args.prepare) pause = start;
 		if (!args.id) args.id = 'Kaylee-' + (this.inc++);
 		var tmp = {
 			id: args.id,
 			func: func,
-			duration: duration,
+			duration: args.duration,
 			end: undefined,
 			start: start,
-			pause: pause,
-			callback: args.callback,
-			stop: function() {Kaylee.stop(args.id)},
-			pause:  function() {Kaylee.pause(args.id)},
-			play:  function() {Kaylee.play(args.id)},
-			toggle:  function() {Kaylee.toggle(args.id)}
+			p: pause,
+			stop: function(){Kaylee.stop(args.id)},
+			pause: function(){Kaylee.pause(args.id)},
+			callback: args.callback
 		}
 		if (args.prepare) {
 			this.paused[this.paused.length] = tmp;
@@ -435,11 +436,11 @@ Kaylee = {
 		var curr = Date.now();
 		for (var i = 0; i < this.running.length; i++) {
 			if (this.running[i].duration && !this.running[i].end) {
-				if (this.running[i].pause) {
-					var newCurr = curr - (this.running[i].pause - this.running[i].start);
+				if (this.running[i].p) {
+					var newCurr = curr - (this.running[i].p - this.running[i].start);
 					this.running[i].end = newCurr + this.running[i].duration;
 					this.running[i].start = newCurr;
-					this.running[i].pause = undefined;
+					this.running[i].p = undefined;
 				}
 				else {
 					this.running[i].end = curr + this.running[i].duration;
@@ -465,4 +466,4 @@ Kaylee = {
 	},
 	running: [],
 	paused: []
-};
+}

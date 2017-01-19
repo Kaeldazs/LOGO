@@ -11,7 +11,7 @@ var Canvas = function() {
     // create a new canvas
     this.create  = function() {
         _this.el = document.createElement('canvas');
-
+        
         // set sizes
         _this.h = window.innerHeight * _this.pxRatio;
         _this.w = window.innerWidth * _this.pxRatio;

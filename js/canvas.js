@@ -1,10 +1,4 @@
 var Canvas = function() {
-    this.el      = undefined,
-    this.ctx     = undefined,
-    this.h       = undefined,
-    this.w       = undefined,
-    this.cx      = undefined,
-    this.cy      = undefined,
     this.pxRatio = window.devicePixelRatio || 1;
     var _this    = this;
 
@@ -27,6 +21,10 @@ var Canvas = function() {
         _this.ctx.clearRect(0, 0, _this.w, _this.h);
     };
 
+    this.backgroundColor = function(color) {
+        _this.el.style.backgroundColor = color;
+    };
+
     this.setSize = function() {
         _this.h = (window.innerHeight - 200) * _this.pxRatio;
         _this.w = window.innerWidth * _this.pxRatio;
@@ -36,5 +34,5 @@ var Canvas = function() {
         _this.el.height = _this.h;
         _this.cx =  Math.round(_this.w/2);
         _this.cy =  Math.round(_this.h/2);
-    }
+    };
 };

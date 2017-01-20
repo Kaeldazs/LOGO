@@ -1,5 +1,7 @@
 // turtle properties
 var turtle = {
+    speedInitial: 300,
+    speed: 300,
     getPos: function() {
         return [
             this.x + this.currentMoveX, 
@@ -22,7 +24,7 @@ var animLoop = Kaylee.prepare(function() {
     canvasTurtle.clear();
 
     // run commands
-	itpr.execBuffer(true);
+	itpr.execBuffer();
 
     // draw turtle
     draw.turtle(canvasTurtle);
@@ -44,29 +46,14 @@ var windowResizeTimeout = undefined;
     // canvas: draw
     canvasDraw = new Canvas();
     canvasDraw.create();
+    canvasDraw.backgroundColor('#0000F0');
 
     // canvas: turtle && temporary draw
 	canvasTurtle = new Canvas();
     canvasTurtle.create();
 
-    // set event: window resize
-    Events.create('windowResize', window, 'resize', function() {
-        animLoop.pause();
-        clearTimeout(windowResizeTimeout);
-        windowResizeTimeout = setTimeout(function() {
-            // set canvas sizes
-            canvasDraw.setSize();
-            canvasTurtle.setSize();
-
-            itpr.buffer = itpr.rI.concat(itpr.buffer);
-            itpr.rI = [];
-
-            turtle.reset();
-
-            animLoop.play();
-        }, 300);
-    });
-    Events.add('windowResize');
+    // set window events
+    Events.setWindowEvents();
 
     // draw turtle
     draw.turtle(canvasTurtle);

@@ -13,7 +13,7 @@ var itpr = {
 			type: 'procedure',
 			reg: /^(AV)\s([0-9]+|:[a-zA-Z0-9_$]+)/,
 			doc: 'AV pixels // The turtle moves pixels foward',
-			duration: 100,
+			duration: function() { return turtle.speed },
 			easing: 'ease',
 			exec: function(percent) {
 				var move = itpr.buffer[0].args * percent;
@@ -44,7 +44,7 @@ var itpr = {
 			type: 'procedure',
 			reg: /^(RE)\s([0-9]+|:[a-zA-Z0-9_$]+)/,
 			doc: 'RE pixels // The turtle moves pixels backward',
-			duration: 100,
+			duration: function() { return turtle.speed },
 			easing: 'ease',
 			exec: function(percent) {
 				var move = itpr.buffer[0].args * percent;
@@ -75,7 +75,7 @@ var itpr = {
 			type: 'procedure',
 			reg: /^(TD)\s([0-9]+|:[a-zA-Z0-9_$]+)/,
 			doc: 'TD degrees // The turtle turns degrees to the right',
-			duration: 100,
+			duration: function() { return turtle.speed },
 			easing: 'ease',
 			exec: function(percent) {
 				var move = itpr.buffer[0].args * percent;
@@ -92,7 +92,7 @@ var itpr = {
 			type: 'procedure',
 			reg: /^(TG)\s([0-9]+|:[a-zA-Z0-9_$]+)/,
 			doc: 'TG degrees // The turtle turns degrees to the left',
-			duration: 100,
+			duration: function() { return turtle.speed },
 			exec: function(percent) {
 				var move = -itpr.buffer[0].args * percent;
 				if (percent == 1) {
@@ -140,7 +140,7 @@ var itpr = {
 			type: 'procedure',
 			reg: /^(CT)/,
 			doc: 'CT // Hide the turtle',
-			duration: 200,
+			duration: function() { return turtle.speed },
 			exec: function(percent) {
 				if (percent == 1) {
 					turtle.opacity = 0;
@@ -154,7 +154,7 @@ var itpr = {
 			type: 'procedure',
 			reg: /^(MT)/,
 			doc: 'MT // Show the turtle',
-			duration: 200,
+			duration: function() { return turtle.speed },
 			exec: function(percent) {
 				if (percent == 1) {
 					turtle.opacity = 1;
@@ -235,7 +235,7 @@ var itpr = {
 									};
 								}
 							}
-							animLoop.play();
+							itpr.play();
 						}
 					}
 					itpr.capture = match[2] + '';
@@ -272,7 +272,7 @@ var itpr = {
 			};
 
 			// launch animation loop
-			animLoop.play();
+			itpr.play();
 		}
 	},
 
@@ -286,15 +286,52 @@ var itpr = {
 	// which command is capturing user input
 	capture: false,
 
-	execBuffer: function(animation) {
+	// animation is running ?
+	pauseStart: Date.now(),
+
+	// interpreter controls
+	pause: function() {
+		animLoop.pause();
+		itpr.pauseStart = Date.now();
+	},
+
+	play: function() {
+		animLoop.play();
+	},
+
+	toggle: function() {
+		itpr.pauseStart ? itpr.play() : itpr.pause();
+	},
+
+	speedChanged: false,
+	speed: function(speed) {
+		if (speed == 0) {
+			turtle.speed = 0;
+		}
+		else {
+			turtle.speed = turtle.speedInitial / speed;
+		}
+		itpr.speedChanged = true;
+	},
+
+	// execution du buffer
+	execBuffer: function() {
 		// if instruction in buffer
 	    if (itpr.buffer.length > 0 && itpr.buffer[0]) {
 	    	time = Date.now();
-	    	// if start time is unset
+
+	    	// set start time
 	    	if (!itpr.buffer[0].start) itpr.buffer[0].start = time;
+	    	else if (itpr.pauseStart) {
+
+	    		itpr.buffer[0].start = itpr.buffer[0].start + (time - itpr.pauseStart);
+	    	}
+	    	itpr.pauseStart = false;
 
 	    	// set animation duration
-	    	if (!itpr.buffer[0].duration) itpr.buffer[0].duration = itpr.commands[itpr.buffer[0].instruction].duration;
+	    	if (!itpr.buffer[0].duration && itpr.commands[itpr.buffer[0].instruction].duration) {
+	    		itpr.buffer[0].duration = itpr.commands[itpr.buffer[0].instruction].duration();
+	    	}
 	        if (!itpr.buffer[0].duration) itpr.buffer[0].duration = 0;
 
 	    	// if instruction is running for the last time
@@ -310,8 +347,23 @@ var itpr = {
 	    	// if instruction is curently running
 	    	else {
 	    		var percent = ((time-itpr.buffer[0].start)/itpr.buffer[0].duration);
-	            if (Kaylee.easing[itpr.commands[itpr.buffer[0].instruction].easing]) {
+	            if (turtle.speed > 100 && Kaylee.easing[itpr.commands[itpr.buffer[0].instruction].easing]) {
 	                percent = Kaylee.easing[itpr.commands[itpr.buffer[0].instruction].easing](percent, 0, 1, 1);
+	            }
+
+	            if (itpr.speedChanged) {
+	            	// itpr.buffer[0].duration
+	            	// percent
+	            	var lastDuration = itpr.buffer[0].duration;
+	            	itpr.buffer[0].duration = itpr.commands[itpr.buffer[0].instruction].duration();
+			        if (!itpr.buffer[0].duration) itpr.buffer[0].duration = 0;
+	            	
+	            	var percentTimeInitial = lastDuration * percent;
+	            	var percentTimeCurrent = itpr.buffer[0].duration * percent;
+	            	var diff = percentTimeInitial - percentTimeCurrent; // +
+	            	itpr.buffer[0].start += diff;
+
+	            	itpr.speedChanged = false;
 	            }
 	    		if (percent) itpr.commands[itpr.buffer[0].instruction].exec(percent);
 	    	}
@@ -319,7 +371,7 @@ var itpr = {
 	    // if buffer is empty
 	    else {
 	    	// stop animation loop
-	    	animLoop.pause();
+	    	itpr.pause();
 	    }
 	},
 

@@ -13,7 +13,7 @@ var itpr = {
 			type: 'procedure',
 			reg: /^(AV)\s([0-9]+|:[a-zA-Z0-9_$]+)/,
 			doc: 'AV pixels // The turtle moves pixels foward',
-			duration: 300,
+			duration: 100,
 			easing: 'ease',
 			exec: function(percent) {
 				var move = itpr.buffer[0].args * percent;
@@ -44,7 +44,7 @@ var itpr = {
 			type: 'procedure',
 			reg: /^(RE)\s([0-9]+|:[a-zA-Z0-9_$]+)/,
 			doc: 'RE pixels // The turtle moves pixels backward',
-			duration: 300,
+			duration: 100,
 			easing: 'ease',
 			exec: function(percent) {
 				var move = itpr.buffer[0].args * percent;
@@ -75,7 +75,7 @@ var itpr = {
 			type: 'procedure',
 			reg: /^(TD)\s([0-9]+|:[a-zA-Z0-9_$]+)/,
 			doc: 'TD degrees // The turtle turns degrees to the right',
-			duration: 300,
+			duration: 100,
 			easing: 'ease',
 			exec: function(percent) {
 				var move = itpr.buffer[0].args * percent;
@@ -92,7 +92,7 @@ var itpr = {
 			type: 'procedure',
 			reg: /^(TG)\s([0-9]+|:[a-zA-Z0-9_$]+)/,
 			doc: 'TG degrees // The turtle turns degrees to the left',
-			duration: 300,
+			duration: 100,
 			exec: function(percent) {
 				var move = -itpr.buffer[0].args * percent;
 				if (percent == 1) {
@@ -133,22 +133,14 @@ var itpr = {
 			reg: /^(VE)/,
 			doc: 'VE // Clears the screen and put the turtle at the center, facing upwards',
 			exec: function(percent) {
-				console.log(
-	    			'Running ' + 
-	    			itpr.buffer[0].instruction 
-	    			+' '+ 
-	    			itpr.buffer[0].args
-	    			+ ' ('+ 
-	    			percent
-	    			+')'
-	    		);
+				itpr.clear(true);
 			}
 		},
 		CT: {
 			type: 'procedure',
 			reg: /^(CT)/,
 			doc: 'CT // Hide the turtle',
-			duration: 500,
+			duration: 200,
 			exec: function(percent) {
 				if (percent == 1) {
 					turtle.opacity = 0;
@@ -162,7 +154,7 @@ var itpr = {
 			type: 'procedure',
 			reg: /^(MT)/,
 			doc: 'MT // Show the turtle',
-			duration: 500,
+			duration: 200,
 			exec: function(percent) {
 				if (percent == 1) {
 					turtle.opacity = 1;
@@ -259,7 +251,13 @@ var itpr = {
 			}
 		}
 	},
+
+	// running instructions
 	buffer: [],
+
+	// rendered instructions
+	rI: [],
+
 	store: function(match) {
 		if (itpr.capture) {
 			if (itpr.commands[itpr.capture]) {
@@ -277,13 +275,53 @@ var itpr = {
 			animLoop.play();
 		}
 	},
-	// reset buffer
-	clear: function() {
+
+	// reset all
+	clear: function(animate) {
+		turtle.reset();
 		itpr.buffer = [];
+		itpr.rI = [];
 	},
 
 	// which command is capturing user input
 	capture: false,
+
+	execBuffer: function(animation) {
+		// if instruction in buffer
+	    if (itpr.buffer.length > 0 && itpr.buffer[0]) {
+	    	time = Date.now();
+	    	// if start time is unset
+	    	if (!itpr.buffer[0].start) itpr.buffer[0].start = time;
+
+	    	// set animation duration
+	    	if (!itpr.buffer[0].duration) itpr.buffer[0].duration = itpr.commands[itpr.buffer[0].instruction].duration;
+	        if (!itpr.buffer[0].duration) itpr.buffer[0].duration = 0;
+
+	    	// if instruction is running for the last time
+	    	if (time >= itpr.buffer[0].start + itpr.buffer[0].duration) {
+	    		itpr.commands[itpr.buffer[0].instruction].exec(1);
+
+	    		// move instruction to rendered instructions
+	    		itpr.buffer[0].start = undefined;
+	    		itpr.rI[itpr.rI.length] = itpr.buffer[0];
+	    		itpr.buffer.splice(0,1);
+	    	}
+
+	    	// if instruction is curently running
+	    	else {
+	    		var percent = ((time-itpr.buffer[0].start)/itpr.buffer[0].duration);
+	            if (Kaylee.easing[itpr.commands[itpr.buffer[0].instruction].easing]) {
+	                percent = Kaylee.easing[itpr.commands[itpr.buffer[0].instruction].easing](percent, 0, 1, 1);
+	            }
+	    		if (percent) itpr.commands[itpr.buffer[0].instruction].exec(percent);
+	    	}
+	    }
+	    // if buffer is empty
+	    else {
+	    	// stop animation loop
+	    	animLoop.pause();
+	    }
+	},
 
 	// interprete a string input
 	run: function(str) {

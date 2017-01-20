@@ -13,14 +13,7 @@ var Canvas = function() {
         _this.el = document.createElement('canvas');
         
         // set sizes
-        _this.h = window.innerHeight * _this.pxRatio;
-        _this.w = window.innerWidth * _this.pxRatio;
-        _this.el.style.width = window.innerWidth + 'px';
-        _this.el.style.height = window.innerHeight + 'px';
-        _this.el.width = _this.w;
-        _this.el.height = _this.h;
-        _this.cx =  Math.round(_this.w/2);
-        _this.cy =  Math.round(_this.h/2);
+        _this.setSize();
 
         // append canvas on body
         document.body.appendChild(_this.el);
@@ -33,4 +26,15 @@ var Canvas = function() {
     this.clear = function () {
         _this.ctx.clearRect(0, 0, _this.w, _this.h);
     };
+
+    this.setSize = function() {
+        _this.h = (window.innerHeight - 200) * _this.pxRatio;
+        _this.w = window.innerWidth * _this.pxRatio;
+        _this.el.style.width = (window.innerWidth) + 'px';
+        _this.el.style.height = (window.innerHeight - 200) + 'px';
+        _this.el.width = _this.w;
+        _this.el.height = _this.h;
+        _this.cx =  Math.round(_this.w/2);
+        _this.cy =  Math.round(_this.h/2);
+    }
 };

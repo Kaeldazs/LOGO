@@ -1,26 +1,19 @@
 // turtle properties
 var turtle = {
-    x: 0,
-    currentMoveX: 0,
-    y: 0,
-    currentMoveY: 0,
-    a: 0,
-    opacity: 1,
-    draw: true,
-    visible: true,
-    colorLine: '#FFFFFF',
-    currentMoveA: 0,
     getPos: function() {
         return [
-            turtle.x + turtle.currentMoveX, 
-            turtle.y + turtle.currentMoveY, 
-            turtle.a + turtle.currentMoveA
+            this.x + this.currentMoveX, 
+            this.y + this.currentMoveY, 
+            this.a + this.currentMoveA
         ];
+    },
+    reset: function() {
+        this.x = this.currentMoveX = this.y = this.currentMoveY = this.a = this.currentMoveA = 0;
+        this.opacity = 1;
+        this.draw = this.visible = true;
+        this.colorLine = '#FFFFFF';
     }
 };
-
-// rendered instructions
-var rI = [];
 
 // animation loop
 var animLoop = Kaylee.prepare(function() {
@@ -28,47 +21,26 @@ var animLoop = Kaylee.prepare(function() {
     // clear canvas
     canvasTurtle.clear();
 
-	// if instruction in buffer
-    if (itpr.buffer.length > 0) {
-    	time = Date.now();
-    	// if start time is unset
-    	if (!itpr.buffer[0].start) itpr.buffer[0].start = time;
+    // run commands
+	itpr.execBuffer(true);
 
-    	// if duration is unset
-    	if (!itpr.buffer[0].duration) itpr.buffer[0].duration = itpr.commands[itpr.buffer[0].instruction].duration;
-        if (!itpr.buffer[0].duration) itpr.buffer[0].duration = 0;
-
-    	// if instruction is running for the last time
-    	if (time >= itpr.buffer[0].start + itpr.buffer[0].duration) {
-    		itpr.commands[itpr.buffer[0].instruction].exec(1);
-
-    		// move instruction to rendered instructions
-    		itpr.buffer[0].start = undefined;
-    		rI[rI.length] = itpr.buffer[0];
-    		itpr.buffer.shift();
-    	}
-
-    	// if instruction is curently running
-    	else {
-    		var percent = ((time-itpr.buffer[0].start)/itpr.buffer[0].duration);
-            if (Kaylee.easing[itpr.commands[itpr.buffer[0].instruction].easing]) {
-                percent = Kaylee.easing[itpr.commands[itpr.buffer[0].instruction].easing](percent, 0, 1, 1);
-            }
-    		if (percent) itpr.commands[itpr.buffer[0].instruction].exec(percent);
-    	}
-    }
-    // if buffer is empty
-    else {
-    	// stop animation loop
-    	animLoop.pause();
-    }
     // draw turtle
     draw.turtle(canvasTurtle);
 });
 
-(function() {
-	// generate a new canvas objects
+function test() {
+    var cmd =  'LC TG 90 AV 200 TD 90 BC LC RE 60 TG 90 AV 60 TD 90 BC FCC #000 REPETE 8 [AV 200 TD 135] LC AV 10 TD 90 AV 20 TG 90 BC FCC #FFF CT REPETE 8 [AV 180 TD 135] LC AV 90 TG 90 MT AV 75 TD 90 RE 17 BC REPETE 10 [FCC #000 AV 34 TD 18 FCC #FFF AV 34 TD 18] LC AV 17 TD 90 AV 110 TG 90 AV 100 TD 72 AV 180 LC RE 60 TG 90 AV 60 TD 90 BC FCC #000 REPETE 8 [AV 200 TD 135] LC AV 10 TD 90 AV 20 TG 90 BC FCC #FFF CT REPETE 8 [AV 180 TD 135] LC AV 90 TG 90 MT AV 75 TD 90 RE 17 BC REPETE 10 [FCC #000 AV 34 TD 18 FCC #FFF AV 34 TD 18] LC AV 17 TD 90 AV 110 TG 90 AV 100 TD 72 AV 180 LC RE 60 TG 90 AV 60 TD 90 BC FCC #000 REPETE 8 [AV 200 TD 135] LC AV 10 TD 90 AV 20 TG 90 BC FCC #FFF CT REPETE 8 [AV 180 TD 135] LC AV 90 TG 90 MT AV 75 TD 90 RE 17 BC REPETE 10 [FCC #000 AV 34 TD 18 FCC #FFF AV 34 TD 18] LC AV 17 TD 90 AV 110 TG 90 AV 100 TD 72 AV 180 LC RE 60 TG 90 AV 60 TD 90 BC FCC #000 REPETE 8 [AV 200 TD 135] LC AV 10 TD 90 AV 20 TG 90 BC FCC #FFF CT REPETE 8 [AV 180 TD 135] LC AV 90 TG 90 MT AV 75 TD 90 RE 17 BC REPETE 10 [FCC #000 AV 34 TD 18 FCC #FFF AV 34 TD 18] LC AV 17 TD 90 AV 110 TG 90 AV 100 TD 72 AV 180 LC RE 60 TG 90 AV 60 TD 90 BC FCC #000 REPETE 8 [AV 200 TD 135] LC AV 10 TD 90 AV 20 TG 90 BC FCC #FFF CT REPETE 8 [AV 180 TD 135] LC AV 90 TG 90 MT AV 75 TD 90 RE 17 BC REPETE 10 [FCC #000 AV 34 TD 18 FCC #FFF AV 34 TD 18] LC AV 17 TD 90 AV 110 TG 90 AV 100 TD 72 AV 180 TD 104 AV 235 TG 104 LC RE 60 TG 90 AV 60 TD 90 BC FCC #000 REPETE 8 [AV 200 TD 135] LC AV 10 TD 90 AV 20 TG 90 BC FCC #FFF CT REPETE 8 [AV 180 TD 135] LC AV 90 TG 90 MT AV 75 TD 90 RE 17 BC REPETE 10 [FCC #000 AV 34 TD 18 FCC #FFF AV 34 TD 18] LC AV 17 TD 90 AV 110 TG 90';
 
+    itpr.run(cmd);
+}
+
+var windowResizeTimeout = undefined;
+
+(function() {
+    // set turtle
+    turtle.reset();
+
+	// generate a new canvas objects
     // canvas: draw
     canvasDraw = new Canvas();
     canvasDraw.create();
@@ -77,12 +49,27 @@ var animLoop = Kaylee.prepare(function() {
 	canvasTurtle = new Canvas();
     canvasTurtle.create();
 
+    // set event: window resize
+    Events.create('windowResize', window, 'resize', function() {
+        animLoop.pause();
+        clearTimeout(windowResizeTimeout);
+        windowResizeTimeout = setTimeout(function() {
+            // set canvas sizes
+            canvasDraw.setSize();
+            canvasTurtle.setSize();
+
+            itpr.buffer = itpr.rI.concat(itpr.buffer);
+            itpr.rI = [];
+
+            turtle.reset();
+
+            animLoop.play();
+        }, 300);
+    });
+    Events.add('windowResize');
+
     // draw turtle
     draw.turtle(canvasTurtle);
+
+    test();
 })();
-
-function test() {
-    var cmd =  'POUR CIRCLE :size REPETE 10 [FCC #000 AV :size TD 18 FCC #FFF AV :size TD 18] FIN POUR STAR :size REPETE 8 [AV :size TD 135] FIN LC RE 60 TG 90 AV 60 TD 90 BC FCC #000 STAR 200 LC AV 10 TD 90 AV 20 TG 90 BC FCC #CCC CT STAR 180 LC AV 90 TG 90 MT AV 75 TD 90 RE 17 BC CIRCLE 34 LC AV 17 TD 90 AV 110';
-
-    itpr.run(cmd);
-}

@@ -315,7 +315,7 @@ var itpr = {
 	},
 
 	// execution du buffer
-	execBuffer: function() {
+	execBuffer: function(animation) {
 		// if instruction in buffer
 	    if (itpr.buffer.length > 0 && itpr.buffer[0]) {
 	    	time = Date.now();
@@ -323,16 +323,20 @@ var itpr = {
 	    	// set start time
 	    	if (!itpr.buffer[0].start) itpr.buffer[0].start = time;
 	    	else if (itpr.pauseStart) {
-
-	    		itpr.buffer[0].start = itpr.buffer[0].start + (time - itpr.pauseStart);
+	    		if (animation) {
+	    			itpr.buffer[0].start = itpr.buffer[0].start + (time - itpr.pauseStart);
+	    		}
 	    	}
-	    	itpr.pauseStart = false;
+	    	if (animation) itpr.pauseStart = false;
 
 	    	// set animation duration
-	    	if (!itpr.buffer[0].duration && itpr.commands[itpr.buffer[0].instruction].duration) {
-	    		itpr.buffer[0].duration = itpr.commands[itpr.buffer[0].instruction].duration();
+	    	if (animation) {
+	    		if (!itpr.buffer[0].duration && itpr.commands[itpr.buffer[0].instruction].duration) {
+		    		itpr.buffer[0].duration = itpr.commands[itpr.buffer[0].instruction].duration();
+		    	}
+		        if (!itpr.buffer[0].duration) itpr.buffer[0].duration = 0;
 	    	}
-	        if (!itpr.buffer[0].duration) itpr.buffer[0].duration = 0;
+	    	else itpr.buffer[0].duration = 0;
 
 	    	// if instruction is running for the last time
 	    	if (time >= itpr.buffer[0].start + itpr.buffer[0].duration) {
@@ -340,6 +344,7 @@ var itpr = {
 
 	    		// move instruction to rendered instructions
 	    		itpr.buffer[0].start = undefined;
+	    		itpr.buffer[0].duration = undefined;
 	    		itpr.rI[itpr.rI.length] = itpr.buffer[0];
 	    		itpr.buffer.splice(0,1);
 	    	}

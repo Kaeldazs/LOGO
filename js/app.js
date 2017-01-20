@@ -24,7 +24,7 @@ var animLoop = Kaylee.prepare(function() {
     canvasTurtle.clear();
 
     // run commands
-	itpr.execBuffer();
+	itpr.execBuffer(true);
 
     // draw turtle
     draw.turtle(canvasTurtle);

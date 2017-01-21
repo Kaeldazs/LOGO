@@ -21,10 +21,6 @@ var Canvas = function() {
         _this.ctx.clearRect(0, 0, _this.w, _this.h);
     };
 
-    this.backgroundColor = function(color) {
-        _this.el.style.backgroundColor = color;
-    };
-
     this.setSize = function() {
         _this.h = (window.innerHeight - 200) * _this.pxRatio;
         _this.w = window.innerWidth * _this.pxRatio;

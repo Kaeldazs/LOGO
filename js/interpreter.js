@@ -278,9 +278,45 @@ var itpr = {
 
 	// reset all
 	clear: function(animate) {
-		turtle.reset();
+
+		itpr.pause();
 		itpr.buffer = [];
 		itpr.rI = [];
+
+		if (!animate) {
+			canvasDraw.clear();
+			turtle.reset();
+			draw.turtle(canvasTurtle);
+		}
+		else {
+			turtle.x += turtle.currentMoveX;
+			turtle.y += turtle.currentMoveY;
+			turtle.currentMoveX = 0;
+			turtle.currentMoveY = 0;
+			var turtlePos = [turtle.x, turtle.y, turtle.a % 360, turtle.opacity];
+			Kaylee.animate(function(start, curr) {
+				var percent = ((curr - start) / 300);
+	            percent = Kaylee.easing['ease'](percent, 0, 1, 1);
+
+	            turtle.x = turtlePos[0] * (1 - percent);
+	            turtle.y = turtlePos[1] * (1 - percent);
+	            turtle.a = turtlePos[2] * (1 - percent);
+	            turtle.opacity = turtle[3] + (1 - turtle[3]) * percent;
+
+	            canvasTurtle.clear();
+				draw.turtle(canvasTurtle);
+
+	            canvasDraw.el.style.opacity = 1 - percent;
+	            if (curr - start > 300) {
+	            	this.stop();
+	            	turtle.reset();
+					canvasDraw.clear();
+					canvasTurtle.clear();
+					canvasDraw.el.style.opacity = '';
+					draw.turtle(canvasTurtle);
+	            }
+			});
+		}
 	},
 
 	// which command is capturing user input

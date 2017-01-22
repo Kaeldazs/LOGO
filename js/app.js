@@ -14,6 +14,9 @@ var turtle = {
         this.opacity = 1;
         this.draw = this.visible = true;
         this.colorLine = '#FFFFFF';
+    },
+    set: function() {
+        this.reset();
     }
 };
 
@@ -40,8 +43,12 @@ function test() {
 var windowResizeTimeout = undefined;
 
 (function() {
+    // generate Shell
+    shell = new Shell();
+    shell.create();
+
     // set turtle
-    turtle.reset();
+    turtle.set();
 
 	// generate a new canvas objects
     // canvas: draw
@@ -58,5 +65,6 @@ var windowResizeTimeout = undefined;
     // draw turtle
     draw.turtle(canvasTurtle);
 
-    test();
+    //test();
 })();
+

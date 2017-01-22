@@ -1,4 +1,4 @@
-body,html{
+body, html{
 	padding: 0;
 	margin: 0;
 	overflow: hidden;
@@ -9,5 +9,42 @@ canvas {
 	top: 0;
 	left: 0;
 	padding: 0;
-	margin: 0;
+	margin: 0
+}
+#shell {
+	position: absolute;
+    background: black;
+    width: 100%;
+    left: 0;
+    bottom: 0;
+    color: #00d700;
+    font-family: 'Arial';
+    box-sizing: border-box;
+    padding: 14px
+}
+
+@keyframes blink {
+  0%    { opacity: 1 }
+  45%   { opacity: 1 }
+  55%   { opacity: 0 }
+  100%  { opacity: 0 }
+}
+
+.blink {
+	-webkit-animation: blink 900ms infinite;
+	-moz-animation:    blink 900ms infinite;
+	-o-animation:      blink 900ms infinite;
+	animation:         blink 900ms infinite
+}
+
+#shell-input {
+	opacity: 0; 
+	position: absolute
+}
+
+#caret {
+	height: 0px;
+	width: 10px;
+	border-bottom: 4px solid #00d700;
+	color: #00d700
 }

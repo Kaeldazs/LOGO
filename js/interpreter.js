@@ -166,7 +166,7 @@ var itpr = {
 		},
 		REPETE: {
 			type: 'structure',
-			reg: /^REPETE\s([0-9]+|:[a-zA-Z0-9_$]+)\s\[([^\]]+)\]/,
+			reg: /^(REPETE)\s([0-9]+|:[a-zA-Z0-9_$]+)\s\[/,
 			doc: 'REPETE x [commands] // Do the commands x times',
 			store: function(match) {
 				var iterations = match[1];
@@ -259,11 +259,13 @@ var itpr = {
 	rI: [],
 
 	store: function(match) {
+		// si la capture de l'instruction est déléguée
 		if (itpr.capture) {
 			if (itpr.commands[itpr.capture]) {
 				itpr.commands[itpr.capture].buffer[itpr.commands[itpr.capture].buffer.length] = [match[1], match[2]];
 			}
 		}
+		// sinon, insertion de l'instruction dans le buffer
 		else {
 			itpr.buffer[itpr.buffer.length] = {
 				instruction: match[1],
@@ -376,13 +378,16 @@ var itpr = {
 
 	    	// if instruction is running for the last time
 	    	if (time >= itpr.buffer[0].start + itpr.buffer[0].duration) {
+
 	    		itpr.commands[itpr.buffer[0].instruction].exec(1);
 
 	    		// move instruction to rendered instructions
-	    		itpr.buffer[0].start = undefined;
-	    		itpr.buffer[0].duration = undefined;
-	    		itpr.rI[itpr.rI.length] = itpr.buffer[0];
-	    		itpr.buffer.splice(0,1);
+	    		if (itpr.buffer[0] && itpr.rI) {
+	    			itpr.buffer[0].start = undefined;
+		    		itpr.buffer[0].duration = undefined;
+		    		itpr.rI[itpr.rI.length] = itpr.buffer[0];
+		    		itpr.buffer.splice(0,1);
+	    		}
 	    	}
 
 	    	// if instruction is curently running
@@ -421,12 +426,21 @@ var itpr = {
 		str = trimWhiteSpace(str);
 		for (var i in this.commands) {
 			var match = str.match(this.commands[i].reg);
+			if (match && match[1] == 'REPETE') {
+				var bracket = 1;
+				var j = match[0].length - 1;
+				while (bracket > 0 || j < str.length) {
+					j++;
+					if (str[j] == '[') bracket++;
+					else if (str[j] == ']') bracket--;
+				}
+				match = ['REPETE', match[2], str.substring(match[0].length, j - 1)];
+			}
 			if (match) {
 				this.commands[i].store ? this.commands[i].store(match) : itpr.store(match); 
 				str = str.replace(match[0], '');
 				itpr.run(str);
 			}
-
 		}
 	}
 }

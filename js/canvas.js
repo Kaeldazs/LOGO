@@ -22,7 +22,7 @@ var Canvas = function() {
     };
 
     this.setSize = function() {
-        _this.h = (window.innerHeight - 200) * _this.pxRatio;
+        _this.h = (window.innerHeight - shell.height) * _this.pxRatio;
         _this.w = window.innerWidth * _this.pxRatio;
         _this.el.style.width = (window.innerWidth) + 'px';
         _this.el.style.height = (window.innerHeight - 200) + 'px';

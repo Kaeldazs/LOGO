@@ -171,16 +171,12 @@ var itpr = {
 			store: function(match) {
 				var iterations = match[1];
 				var commands = match[2];
-				if (itpr.capture) {
-					if (itpr.commands[itpr.capture]) {
-						itpr.commands[itpr.capture].buffer[itpr.commands[itpr.capture].buffer.length] = ['REPETE', match[1], match[2]];
-					}
+				console.log(commands);
+				var ret = '';
+				for (var i = 0; i < iterations; i++) {
+					ret += ' ' + commands;
 				}
-				else {
-					for (var i = 0; i < iterations; i++) {
-						itpr.run(commands);
-					}
-				}
+				return ret;
 			}
 		},
 		POUR: {
@@ -205,37 +201,12 @@ var itpr = {
 						buffer: [],
 						localVar: args,
 						store: function(match) {
-							var i;
-							for (i = 0; i < this.buffer.length; i++) {
-								if (this.buffer[i][0] == 'REPETE') {
-									var tmp = this.buffer[i][2];
-									var iteration = this.buffer[i][1];
-									for (var j = 0; j < this.localVar.length; j++) {
-										var r = new RegExp(' ' + this.localVar[j] + '$', 'g');
-										tmp = tmp.replace(r, ' ' + match[j + 2]);
-										r = new RegExp('^' + this.localVar[j] + '$', 'g');
-										iteration = iteration.replace(r, match[j + 2]);
-										r = new RegExp(' ' + this.localVar[j] + ' ', 'g');
-										tmp = tmp.replace(r, ' ' + match[j + 2] + ' ');
-									}
-									for (var k = 0; k < iteration; k++) {
-										itpr.run(tmp);
-									}
-								}
-								else {
-									var argsStr = this.buffer[i][1];
-									for (var j = 0; j < this.localVar.length; j++) {
-										var r = new RegExp('^'+ this.localVar[j] +'$', 'g')
-										argsStr = argsStr.replace(r, match[j + 2]);
-									}
-									itpr.buffer[itpr.buffer.length] = {
-										instruction: this.buffer[i][0],
-										args: argsStr,
-										start: undefined
-									};
-								}
+							var commands = this.buffer;
+							for (var j = 0; j < this.localVar.length; j++) {
+								var r = new RegExp('(^|\\\s|\\\[)(?:'+ this.localVar[j] +')($|\\\s|\\\])', 'g');
+								commands = commands.replace(r, "$1"+ match[j+2] +"$2");
 							}
-							itpr.play();
+							return commands;
 						}
 					}
 					itpr.capture = match[2] + '';
@@ -262,7 +233,7 @@ var itpr = {
 		// si la capture de l'instruction est déléguée
 		if (itpr.capture) {
 			if (itpr.commands[itpr.capture]) {
-				itpr.commands[itpr.capture].buffer[itpr.commands[itpr.capture].buffer.length] = [match[1], match[2]];
+				itpr.commands[itpr.capture].buffer += ' ' + match;
 			}
 		}
 		// sinon, insertion de l'instruction dans le buffer
@@ -403,7 +374,7 @@ var itpr = {
 	            	var lastDuration = itpr.buffer[0].duration;
 	            	itpr.buffer[0].duration = itpr.commands[itpr.buffer[0].instruction].duration();
 			        if (!itpr.buffer[0].duration) itpr.buffer[0].duration = 0;
-	            	
+
 	            	var percentTimeInitial = lastDuration * percent;
 	            	var percentTimeCurrent = itpr.buffer[0].duration * percent;
 	            	var diff = percentTimeInitial - percentTimeCurrent; // +
@@ -424,23 +395,46 @@ var itpr = {
 	// interprete a string input
 	run: function(str) {
 		str = trimWhiteSpace(str);
-		for (var i in this.commands) {
-			var match = str.match(this.commands[i].reg);
-			if (match && match[1] == 'REPETE') {
-				var bracket = 1;
-				var j = match[0].length - 1;
-				while (bracket > 0 || j < str.length) {
-					j++;
-					if (str[j] == '[') bracket++;
-					else if (str[j] == ']') bracket--;
-				}
-				match = ['REPETE', match[2], str.substring(match[0].length, j - 1)];
-			}
+		var match;
+		if (itpr.capture && itpr.commands[itpr.capture] && itpr.commands[itpr.capture].buffer) {
+			match = str.match(/^(.*\s)?(?=FIN)/g);
 			if (match) {
-				this.commands[i].store ? this.commands[i].store(match) : itpr.store(match); 
+				itpr.commands[itpr.capture].buffer = trimWhiteSpace(itpr.commands[itpr.capture].buffer + ' ' + match[0]);
 				str = str.replace(match[0], '');
+				itpr.capture = false;
 				itpr.run(str);
+			}
+			else itpr.commands[itpr.capture].buffer = trimWhiteSpace(itpr.commands[itpr.capture].buffer + ' ' + str);
+		}
+		else {
+			var bracket, j;
+			for (var i in this.commands) {
+				match = str.match(this.commands[i].reg);
+				if (match) {
+					if (match[1] == 'REPETE') {
+						bracket = 1;
+						j = match[0].length - 1;
+						while (bracket > 0 || j < str.length) {
+							j++;
+							if (str[j] == '[') bracket++;
+							else if (str[j] == ']') bracket--;
+						}
+						match = ['REPETE', match[2], str.substring(match[0].length, j)];
+						str = str.slice(j + 1);
+					}
+					else {
+						str = str.replace(match[0], '');
+					}
+					var store;
+					this.commands[i].store ? store = this.commands[i].store(match) : itpr.store(match);
+					if (store) {
+						itpr.run(store + str);
+					}
+					else itpr.run(str);
+				}
 			}
 		}
 	}
 }
+
+// REPETE 18 [TD 20 REPETE 18 [TD 20 AV 20]]

@@ -4,8 +4,8 @@ var turtle = {
     speed: 300,
     getPos: function() {
         return [
-            this.x + this.currentMoveX, 
-            this.y + this.currentMoveY, 
+            this.x + this.currentMoveX,
+            this.y + this.currentMoveY,
             this.a + this.currentMoveA
         ];
     },
@@ -67,4 +67,3 @@ var windowResizeTimeout = undefined;
 
     //test();
 })();
-

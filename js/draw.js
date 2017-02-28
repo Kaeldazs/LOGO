@@ -16,7 +16,10 @@ var draw = {
 			var newPos = Math.rotate(0, 0, turtlePos[0], turtlePos[1], -turtlePos[2]);
 
 			// dessin de la tortue
-			c.ctx.fillStyle = "black";
+			c.ctx.fillStyle = turtle.colorLine;
+			c.ctx.strokeStyle = "black";
+			c.ctx.lineWidth = 3;
+			c.ctx.lineJoin = "round";
 			c.ctx.beginPath();
 			c.ctx.moveTo(newPos.x, -Math.round(h/2) + newPos.y);
 			c.ctx.lineTo(Math.round(w/2) + newPos.x, Math.round(h/2) + newPos.y);
@@ -25,9 +28,11 @@ var draw = {
 			if (turtle.opacity != 1) {
 				c.ctx.globalAlpha = turtle.opacity;
 				c.ctx.fill();
+				c.ctx.stroke();			
 			}
 			else {
 				c.ctx.fill();
+				c.ctx.stroke();
 			}
 
 			// restoration du contexte initial

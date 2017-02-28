@@ -11,7 +11,7 @@ var itpr = {
 		*/
 		AV: {
 			type: 'procedure',
-			reg: /^(AV)\s([0-9]+|:[a-zA-Z0-9_$]+)/,
+			reg: /^(AV)\s(-?[0-9]+(?:\.[0-9]+)?|:([a-zA-Z0-9_$]+))/,
 			doc: 'AV pixels // The turtle moves pixels foward',
 			duration: function() { return turtle.speed },
 			easing: 'ease',
@@ -42,7 +42,7 @@ var itpr = {
 		},
 		RE: {
 			type: 'procedure',
-			reg: /^(RE)\s([0-9]+|:[a-zA-Z0-9_$]+)/,
+			reg: /^(RE)\s(-?[0-9]+(?:\.[0-9]+)?|:([a-zA-Z0-9_$]+))/,
 			doc: 'RE pixels // The turtle moves pixels backward',
 			duration: function() { return turtle.speed },
 			easing: 'ease',
@@ -73,7 +73,7 @@ var itpr = {
 		},
 		TD: {
 			type: 'procedure',
-			reg: /^(TD)\s([0-9]+|:[a-zA-Z0-9_$]+)/,
+			reg: /^(TD)\s(-?[0-9]+(?:\.[0-9]+)?|:([a-zA-Z0-9_$]+))/,
 			doc: 'TD degrees // The turtle turns degrees to the right',
 			duration: function() { return turtle.speed },
 			easing: 'ease',
@@ -90,7 +90,7 @@ var itpr = {
 		},
 		TG: {
 			type: 'procedure',
-			reg: /^(TG)\s([0-9]+|:[a-zA-Z0-9_$]+)/,
+			reg: /^(TG)\s(-?[0-9]+(?:\.[0-9]+)?|:([a-zA-Z0-9_$]+))/,
 			doc: 'TG degrees // The turtle turns degrees to the left',
 			duration: function() { return turtle.speed },
 			exec: function(percent) {
@@ -171,7 +171,6 @@ var itpr = {
 			store: function(match) {
 				var iterations = match[1];
 				var commands = match[2];
-				console.log(commands);
 				var ret = '';
 				for (var i = 0; i < iterations; i++) {
 					ret += ' ' + commands;
@@ -202,9 +201,11 @@ var itpr = {
 						localVar: args,
 						store: function(match) {
 							var commands = this.buffer;
-							for (var j = 0; j < this.localVar.length; j++) {
-								var r = new RegExp('(^|\\\s|\\\[)(?:'+ this.localVar[j] +')($|\\\s|\\\])', 'g');
-								commands = commands.replace(r, "$1"+ match[j+2] +"$2");
+							if (this.localVar) {
+								for (var j = 0; j < this.localVar.length; j++) {
+									var r = new RegExp('(^|\\\s|\\\[)(?:'+ this.localVar[j] +')($|\\\s|\\\])', 'g');
+									commands = commands.replace(r, "$1"+ match[j+2] +"$2");
+								}
 							}
 							return commands;
 						}
@@ -414,7 +415,7 @@ var itpr = {
 					if (match[1] == 'REPETE') {
 						bracket = 1;
 						j = match[0].length - 1;
-						while (bracket > 0 || j < str.length) {
+						while (bracket > 0 && j < str.length) {
 							j++;
 							if (str[j] == '[') bracket++;
 							else if (str[j] == ']') bracket--;
@@ -438,3 +439,6 @@ var itpr = {
 }
 
 // REPETE 18 [TD 20 REPETE 18 [TD 20 AV 20]]
+// REPETE 18 [AV 100 TD 100] CT
+
+// POUR rect :x :y CT REPETE :y [AV :x TD 180 AV :x TG 90 AV 1 TG 90] MC FIN rect 100 10

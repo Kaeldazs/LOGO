@@ -4,6 +4,7 @@ var Shell = function() {
 	this.history = [];
 	this.historyCursor = -1;
 	this.historyMaxLen = 100;
+	this.clearCanvas = true;
 
 	this.create = function() {
 		_this.el = document.createElement('div');
@@ -65,21 +66,35 @@ var Shell = function() {
 
 			// enter
 			else if (e.which == 13) {
-				var capture = itpr.run(_this.input.value);
+
 				if (_this.history[_this.history.length - 1] != _this.input.value) {
 					_this.history[_this.history.length] = _this.input.value;
 				}
 				if (_this.history.length > this.historyMaxLen) {
 					_this.history.shift();
 				}
-				if (capture) {
-					_this.shellMode.innerHTML = '> ';
-				}
-				else {
-					_this.shellMode.innerHTML = '? ';
-				}
+				var val = _this.input.value;
 				_this.input.value = '';
 				_this.historyCursor = -1;
+
+				var func = function() {
+					var capture = itpr.run(val);
+					if (capture) {
+						_this.shellMode.innerHTML = '> ';
+					}
+					else {
+						_this.shellMode.innerHTML = '? ';
+					}
+				}
+				if (_this.clearCanvas) {
+					_this.clearCanvas = false;
+					itpr.clear(true);
+					turtle.speed = turtle.speedInitial;
+					setTimeout(func, 500);
+				}
+				else {
+					func();
+				}
 			}
 
 			// ctrl-C

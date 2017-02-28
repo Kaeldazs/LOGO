@@ -9,7 +9,7 @@ var Shell = function() {
 	this.create = function() {
 		_this.el = document.createElement('div');
 		_this.el.id = 'shell';
-		_this.el.style.height = "200px";
+		_this.el.style.height = _this.height + "px";
 
 		_this.elLine = document.createElement('div');
 		_this.shellMode = document.createElement('span');

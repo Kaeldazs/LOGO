@@ -48,3 +48,15 @@ canvas {
 	border-bottom: 4px solid #00d700;
 	color: #00d700
 }
+
+#toolbar {
+	background: white;
+	width: 100%;
+	position: absolute;
+	z-index: 999;
+}
+
+#toolbar span {
+	margin: 0 0  0 14px;
+	cursor: pointer;
+}

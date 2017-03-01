@@ -22,7 +22,6 @@ var turtle = {
 
 // animation loop
 var animLoop = Kaylee.prepare(function() {
-
     // clear canvas
     canvasTurtle.clear();
 

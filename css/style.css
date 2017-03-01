@@ -56,7 +56,8 @@ canvas {
 	z-index: 999;
 }
 
-#toolbar span {
-	margin: 0 0  0 14px;
+#toolbar img {
+	margin-left: 14px;
+	height: 24px;
 	cursor: pointer;
 }

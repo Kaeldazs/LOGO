@@ -255,7 +255,10 @@ var itpr = {
 
 	// reset all
 	clear: function(animate) {
-
+		if (shell.clearCanvas) {
+			turtle.speed = turtle.speedInitial;
+			shell.clearCanvas = false;
+		}
 		itpr.pause();
 		itpr.buffer = [];
 		itpr.rI = [];
@@ -274,11 +277,10 @@ var itpr = {
 			Kaylee.animate(function(start, curr) {
 				var percent = ((curr - start) / 300);
 	            percent = Kaylee.easing['ease'](percent, 0, 1, 1);
-
 	            turtle.x = turtlePos[0] * (1 - percent);
 	            turtle.y = turtlePos[1] * (1 - percent);
 	            turtle.a = turtlePos[2] * (1 - percent);
-	            turtle.opacity = turtle[3] + (1 - turtle[3]) * percent;
+	            turtle.opacity = turtlePos[3] + (1 - turtlePos[3]) * percent;
 
 	            canvasTurtle.clear();
 				draw.turtle(canvasTurtle);
@@ -305,11 +307,13 @@ var itpr = {
 	// interpreter controls
 	pause: function() {
 		animLoop.pause();
+		toolbar.btn.playPause.src = 'img/play.png';
 		itpr.pauseStart = Date.now();
 	},
 
 	play: function() {
 		animLoop.play();
+		toolbar.btn.playPause.src = 'img/pause.png';
 	},
 
 	toggle: function() {
@@ -437,6 +441,9 @@ var itpr = {
 					else itpr.run(str);
 				}
 			}
+		}
+		if (str.length > 0 && !match && str[0] != ' ') {
+			console.error('La tortue n\'as pas compris ce que vous vouliez dire par "' + str + '" et s\'est donc arrêtée.');
 		}
 	}
 }

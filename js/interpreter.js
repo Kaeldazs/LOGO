@@ -20,8 +20,8 @@ var itpr = {
 				var newPos = Math.rotate(0, 0, 0, -move, turtle.a);
 				if (percent == 1) {
 
-					var newPosX = Math.round(turtle.x + newPos.x),
-						newPosY = Math.round(turtle.y + newPos.y);
+					var newPosX = turtle.x + newPos.x,
+						newPosY = turtle.y + newPos.y;
 
 					if (turtle.draw) {
 						draw.line(canvasDraw, turtle.x, turtle.y, newPosX, newPosY);
@@ -51,16 +51,16 @@ var itpr = {
 				var newPos = Math.rotate(0, 0, 0, move, turtle.a);
 				if (percent == 1) {
 
-					var newPosX = Math.round(turtle.x + newPos.x),
-						newPosY = Math.round(turtle.y + newPos.y);
+					var newPosX = turtle.x + newPos.x,
+						newPosY =turtle.y + newPos.y;
 
 					if (turtle.draw) {
 						draw.line(canvasDraw, turtle.x, turtle.y, newPosX, newPosY);
 					}
 					turtle.currentMoveX = 0;
 					turtle.currentMoveY = 0;
-					turtle.x += Math.round(newPos.x);
-					turtle.y += Math.round(newPos.y);
+					turtle.x += newPos.x;
+					turtle.y += newPos.y;
 				}
 				else {
 					turtle.currentMoveX = newPos.x;

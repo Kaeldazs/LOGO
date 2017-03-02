@@ -2,6 +2,8 @@
 var turtle = {
     speedInitial: 300,
     speed: 50,
+    height: 30,
+    width: 30,
     getPos: function() {
         return [
             this.x + this.currentMoveX,

@@ -16,6 +16,9 @@ var Shell = function() {
 		_this.el.style.height = _this.height + "px";
 
 		_this.elLine = document.createElement('div');
+		_this.elLine.style.position = 'absolute';
+		_this.elLine.style.bottom = '14px';
+
 		_this.shellMode = document.createElement('span');
 		_this.elLine.appendChild(_this.shellMode);
 		_this.setMode();
@@ -71,7 +74,7 @@ var Shell = function() {
 			// enter
 			else if (e.which == 13) {
 
-				if (_this.history[_this.history.length - 1] != _this.input.value) {
+				if (_this.input.value != '' && _this.history[_this.history.length - 1] != _this.input.value) {
 					_this.history[_this.history.length] = _this.input.value;
 				}
 				if (_this.history.length > this.historyMaxLen) {

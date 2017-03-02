@@ -22,10 +22,10 @@ var Canvas = function() {
     };
 
     this.setSize = function() {
-        _this.h = (window.innerHeight - shell.height) * _this.pxRatio;
-        _this.w = window.innerWidth * _this.pxRatio;
         _this.el.style.width = (window.innerWidth) + 'px';
         _this.el.style.height = (window.innerHeight - shell.height - toolbar.height) + 'px';
+        _this.h = (window.innerHeight - shell.height - toolbar.height) * _this.pxRatio;
+        _this.w = window.innerWidth * _this.pxRatio;
         _this.el.width = _this.w;
         _this.el.height = _this.h;
         _this.cx =  Math.round(_this.w/2);

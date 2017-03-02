@@ -404,7 +404,7 @@ var itpr = {
 	run: function(str) {
 		str = trimWhiteSpace(str);
 		var match;
-		if (itpr.capture && itpr.commands[itpr.capture] && itpr.commands[itpr.capture].buffer) {
+		if (itpr.capture && itpr.commands[itpr.capture]) {
 			match = str.match(/^(.*\s)?(?=FIN)/g);
 			if (match) {
 				itpr.commands[itpr.capture].buffer = trimWhiteSpace(itpr.commands[itpr.capture].buffer + ' ' + match[0]);
@@ -412,7 +412,9 @@ var itpr = {
 				itpr.capture = false;
 				itpr.run(str);
 			}
-			else itpr.commands[itpr.capture].buffer = trimWhiteSpace(itpr.commands[itpr.capture].buffer + ' ' + str);
+			else {
+				itpr.commands[itpr.capture].buffer = trimWhiteSpace(itpr.commands[itpr.capture].buffer + ' ' + str);
+			}
 		}
 		else {
 			var bracket, j;
@@ -441,9 +443,12 @@ var itpr = {
 					else itpr.run(str);
 				}
 			}
+			if (str.length > 0 && !match && str[0] != ' ') {
+				console.error('La tortue n\'as pas réussi à comprendre ce que vous vouliez dire par "' + str + '" et s\'est donc arrêtée.');
+			}
 		}
-		if (str.length > 0 && !match && str[0] != ' ') {
-			console.error('La tortue n\'as pas compris ce que vous vouliez dire par "' + str + '" et s\'est donc arrêtée.');
+		if (!match) {
+			shell.setMode();
 		}
 	}
 }

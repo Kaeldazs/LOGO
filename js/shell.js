@@ -6,6 +6,10 @@ var Shell = function() {
 	this.historyMaxLen = 100;
 	this.clearCanvas = true;
 
+	this.setMode = function() {
+		_this.shellMode.innerHTML = itpr.capture ? '> ' : '? ';
+	};
+
 	this.create = function() {
 		_this.el = document.createElement('div');
 		_this.el.id = 'shell';
@@ -13,8 +17,8 @@ var Shell = function() {
 
 		_this.elLine = document.createElement('div');
 		_this.shellMode = document.createElement('span');
-		_this.shellMode.innerHTML = '? ';
 		_this.elLine.appendChild(_this.shellMode);
+		_this.setMode();
 
 		_this.input = document.createElement('input');
 		_this.input.type = 'text';
@@ -79,12 +83,6 @@ var Shell = function() {
 
 				var func = function() {
 					var capture = itpr.run(val);
-					if (capture) {
-						_this.shellMode.innerHTML = '> ';
-					}
-					else {
-						_this.shellMode.innerHTML = '? ';
-					}
 				}
 				if (_this.clearCanvas) {
 					itpr.clear(true);

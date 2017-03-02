@@ -24,6 +24,30 @@ Toolbar = function() {
 		};
 		tb.appendChild(_this.btn.clear);
 
+		_this.btn.slow = document.createElement('img');
+		_this.btn.slow.src = 'img/slow.png'
+		_this.btn.slow.style.marginTop = (_this.height - 24)/2 + 'px';
+		_this.btn.slow.onclick = function() {
+			itpr.speed(1)
+		};
+		tb.appendChild(_this.btn.slow);
+
+_this.btn.normal = document.createElement('img');
+		_this.btn.normal.src = 'img/normal.png'
+		_this.btn.normal.style.marginTop = (_this.height - 24)/2 + 'px';
+		_this.btn.normal.onclick = function() {
+			itpr.speed(2)
+		};
+		tb.appendChild(_this.btn.normal);
+
+_this.btn.fast = document.createElement('img');
+		_this.btn.fast.src = 'img/fast.png'
+		_this.btn.fast.style.marginTop = (_this.height - 24)/2 + 'px';
+		_this.btn.fast.onclick = function() {
+			itpr.speed(0)
+		};
+		tb.appendChild(_this.btn.fast);
+
 		document.body.appendChild(tb);
 	}
 };

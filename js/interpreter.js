@@ -317,7 +317,7 @@ var itpr = {
 	},
 
 	toggle: function() {
-		itpr.pauseStart ? itpr.play() : itpr.pause();
+		!animLoop.isRunning() && itpr.buffer.length > 0 ? itpr.play() : itpr.pause();
 	},
 
 	speedChanged: false,
@@ -377,8 +377,6 @@ var itpr = {
 	            }
 
 	            if (itpr.speedChanged) {
-	            	// itpr.buffer[0].duration
-	            	// percent
 	            	var lastDuration = itpr.buffer[0].duration;
 	            	itpr.buffer[0].duration = itpr.commands[itpr.buffer[0].instruction].duration();
 			        if (!itpr.buffer[0].duration) itpr.buffer[0].duration = 0;
@@ -405,8 +403,9 @@ var itpr = {
 		str = trimWhiteSpace(str);
 		var match;
 		if (itpr.capture && itpr.commands[itpr.capture]) {
-			match = str.match(/^(.*\s)?(?=FIN)/g);
-			if (match) {
+			match = str.match(/^([^F]|F[^I]|FI[^N])+/g) || [''];
+			var fin = str.match(/(FIN)/g);
+			if (fin) {
 				itpr.commands[itpr.capture].buffer = trimWhiteSpace(itpr.commands[itpr.capture].buffer + ' ' + match[0]);
 				str = str.replace(match[0], '');
 				itpr.capture = false;
@@ -447,9 +446,7 @@ var itpr = {
 				console.error('La tortue n\'as pas réussi à comprendre ce que vous vouliez dire par "' + str + '" et s\'est donc arrêtée.');
 			}
 		}
-		if (!match) {
-			shell.setMode();
-		}
+		shell.setMode();
 	}
 }
 

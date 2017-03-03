@@ -44,6 +44,8 @@ Events = {
 
 		// window resize
 		Events.add('windowResize', window, 'resize', function() {
+			canvasDraw.clear();
+			canvasTurtle.clear();
 	        clearTimeout(windowResizeTimeout);
 	        windowResizeTimeout = setTimeout(function() {
 	        	var paused = itpr.pauseStart;

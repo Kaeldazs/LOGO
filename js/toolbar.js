@@ -30,6 +30,23 @@ Toolbar = function() {
 			_.activeBtn(_.btn.fast, 0);
 		});
 
+		_.genBtnImg('lastStep', 'img/last_step.png', function() {
+			itpr.pause();
+
+			itpr.buffer = itpr.rI.slice(0).concat(itpr.buffer.slice(0));
+
+			canvasDraw.clear();
+
+			itpr.rI = [];
+			turtle.reset();
+			var length = itpr.buffer.length;
+			for (var i = 0; i < length; i++) itpr.execBuffer(false);
+			canvasTurtle.clear();
+
+			draw.turtle(canvasTurtle);
+
+		});
+
 		document.body.appendChild(_.el);
 	}
 

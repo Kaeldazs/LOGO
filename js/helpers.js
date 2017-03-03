@@ -19,3 +19,12 @@ function trimWhiteSpace(str) {
 	}
 	return str;
 }
+
+function removeClassName(className, selector) {
+    var els = document.querySelectorAll(selector);
+    for (var i = 0; i < els.length; i++) {
+        if (els[i].classList.contains(className)) {
+            els[i].classList.remove(className);
+        }
+    }
+}

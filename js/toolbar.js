@@ -20,7 +20,7 @@ Toolbar = function() {
 		_this.btn.clear.src = 'img/clear.png'
 		_this.btn.clear.style.marginTop = (_this.height - 24)/2 + 'px';
 		_this.btn.clear.onclick = function() {
-			itpr.clear(true)
+			itpr.clear(true);
 		};
 		tb.appendChild(_this.btn.clear);
 
@@ -28,26 +28,32 @@ Toolbar = function() {
 		_this.btn.slow.src = 'img/slow.png'
 		_this.btn.slow.style.marginTop = (_this.height - 24)/2 + 'px';
 		_this.btn.slow.onclick = function() {
-			itpr.speed(1)
+			_this.activeBtn(_this.btn.slow, 1);
 		};
 		tb.appendChild(_this.btn.slow);
 
-_this.btn.normal = document.createElement('img');
+	_this.btn.normal = document.createElement('img');
 		_this.btn.normal.src = 'img/normal.png'
 		_this.btn.normal.style.marginTop = (_this.height - 24)/2 + 'px';
 		_this.btn.normal.onclick = function() {
-			itpr.speed(2)
+			_this.activeBtn(_this.btn.normal, 2);
 		};
 		tb.appendChild(_this.btn.normal);
 
-_this.btn.fast = document.createElement('img');
+	_this.btn.fast = document.createElement('img');
 		_this.btn.fast.src = 'img/fast.png'
 		_this.btn.fast.style.marginTop = (_this.height - 24)/2 + 'px';
 		_this.btn.fast.onclick = function() {
-			itpr.speed(0)
+			_this.activeBtn(_this.btn.fast, 0);
 		};
 		tb.appendChild(_this.btn.fast);
 
 		document.body.appendChild(tb);
 	}
+
+	_this.activeBtn = function(el, speed) {
+		removeClassName('active', '#toolbar .active');
+		el.classList.add('active');
+		itpr.speed(speed);
+	};
 };

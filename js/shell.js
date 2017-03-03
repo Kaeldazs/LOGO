@@ -89,8 +89,7 @@ var Shell = function() {
 				}
 				if (_this.clearCanvas) {
 					itpr.clear(true);
-					turtle.speed = turtle.speedInitial;
-					setTimeout(func, 500);
+					setTimeout(func, 400);
 				}
 				else {
 					func();

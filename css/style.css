@@ -62,3 +62,7 @@ canvas {
 	height: 24px;
 	cursor: pointer;
 }
+
+#toolbar .active {
+	background: #FFF;
+}

@@ -36,7 +36,7 @@ Toolbar = function() {
 		_this.btn.normal.src = 'img/normal.png'
 		_this.btn.normal.style.marginTop = (_this.height - 24)/2 + 'px';
 		_this.btn.normal.onclick = function() {
-			_this.activeBtn(_this.btn.normal, 2);
+			_this.activeBtn(_this.btn.normal, 6);
 		};
 		tb.appendChild(_this.btn.normal);
 

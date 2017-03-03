@@ -3,6 +3,10 @@ body, html{
 	margin: 0;
 	overflow: hidden;
 	background-color: #0000F0;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+    -ms-user-select: none;
+	user-select: none; 
 }
 canvas {
 	position: absolute;
@@ -64,5 +68,6 @@ canvas {
 }
 
 #toolbar .active {
-	background: #FFF;
+	background: rgb(195, 195, 252);
+	box-shadow: 0 0 0 2px rgb(195, 195, 252), 0 0 0 3px rgb(0, 0, 240);
 }

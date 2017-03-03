@@ -9,27 +9,22 @@ Toolbar = function() {
 		_.el.style.bottom = shell.height + 'px';
 		_.el.style.height = _.height + 'px';
 
-		_.genBtnImg('playPause', 'img/play.png', function() {
-			itpr.toggle();
-		});
-
 		_.genBtnImg('clear', 'img/clear.png', function() {
 			itpr.clear(true);
 		});
 
-		_.genBtnImg('slow', 'img/slow.png', function() {
-			_.activeBtn(_.btn.slow, 1);
+		_.genBtnImg('backStep', 'img/back_step.png', function() {
+
 		});
 
-		_.genBtnImg('normal', 'img/normal.png', function() {
-			_.activeBtn(_.btn.normal, 6);
-		});
-		_.activeBtn(_.btn.normal, 6);
-
-		_.genBtnImg('fast', 'img/fast.png', function() {
-			_.activeBtn(_.btn.fast, 0);
+		_.genBtnImg('playPause', 'img/play.png', function() {
+			itpr.toggle();
 		});
 
+		_.genBtnImg('stop', 'img/stop.png', function() {
+			itpr.toggle();
+		});
+		
 		_.genBtnImg('nextStep', 'img/next_step.png', function() {
 			if (itpr.interruption === false) {
 				itpr.interruption = 0;
@@ -54,6 +49,19 @@ Toolbar = function() {
 			draw.turtle(canvasTurtle);
 
 		});
+		_.genBtnImg('slow', 'img/slow.png', function() {
+			_.activeBtn(_.btn.slow, 1);
+		});
+
+		_.genBtnImg('normal', 'img/normal.png', function() {
+			_.activeBtn(_.btn.normal, 6);
+		});
+		_.activeBtn(_.btn.normal, 6);
+
+		_.genBtnImg('fast', 'img/fast.png', function() {
+			_.activeBtn(_.btn.fast, 0);
+		});
+
 
 		document.body.appendChild(_.el);
 	}

@@ -331,7 +331,7 @@ var itpr = {
 		itpr.speedChanged = true;
 	},
 
-	interruption: false,
+	frontInterruption: false,
 
 	// execution du buffer
 	execBuffer: function(animation) {
@@ -369,11 +369,11 @@ var itpr = {
 		    		itpr.rI[itpr.rI.length] = itpr.buffer[0];
 		    		itpr.buffer.splice(0,1);
 	    		}
-	    		if (itpr.interruption ==! false) {
-	    			itpr.interruption--;
-	    			if (itpr.interruption === 0) {
+	    		if (itpr.frontInterruption ==! false) {
+	    			itpr.frontInterruption--;
+	    			if (itpr.frontInterruption === 0) {
 	    				itpr.pause();
-	    				itpr.interruption = false;
+	    				itpr.frontInterruption = false;
 	    			}
 	    		}
 	    	}

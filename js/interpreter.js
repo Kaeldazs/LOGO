@@ -76,7 +76,6 @@ var itpr = {
 			reg: /^(TD)\s(-?[0-9]+(?:\.[0-9]+)?|:([a-zA-Z0-9_$]+))/,
 			doc: 'TD degrees // The turtle turns degrees to the right',
 			duration: function() { return turtle.speed },
-			easing: 'ease',
 			exec: function(percent) {
 				var move = itpr.buffer[0].args * percent;
 				if (percent == 1) {
@@ -331,10 +330,14 @@ var itpr = {
 		itpr.speedChanged = true;
 	},
 
-	frontInterruption: false,
+	interruption: {
+		front: false,
+		back: false
+	},
 
 	// execution du buffer
-	execBuffer: function(animation) {
+	execBuffer: function(animation, back) {
+
 		// if instruction in buffer
 	    if (itpr.buffer.length > 0 && itpr.buffer[0]) {
 	    	time = Date.now();
@@ -360,20 +363,22 @@ var itpr = {
 	    	// if instruction is running for the last time
 	    	if (time >= itpr.buffer[0].start + itpr.buffer[0].duration) {
 	   
-	    		itpr.commands[itpr.buffer[0].instruction].exec(1);
+	    		itpr.commands[itpr.buffer[0].instruction].exec(back ? 0 : 1);
 
 	    		// move instruction to rendered instructions
 	    		if (itpr.buffer[0] && itpr.rI) {
 	    			itpr.buffer[0].start = undefined;
 		    		itpr.buffer[0].duration = undefined;
 		    		itpr.rI[itpr.rI.length] = itpr.buffer[0];
-		    		itpr.buffer.splice(0,1);
+		    		itpr.buffer.splice(0, 1);
 	    		}
-	    		if (itpr.frontInterruption ==! false) {
-	    			itpr.frontInterruption--;
-	    			if (itpr.frontInterruption === 0) {
+
+	    		var direction = back ? 'back' : 'front';
+	    		if (itpr.interruption[direction] ==! false) {
+	    			itpr.interruption[direction]--;
+	    			if (itpr.interruption[direction] === 0) {
 	    				itpr.pause();
-	    				itpr.frontInterruption = false;
+	    				itpr.interruption[direction] = false;
 	    			}
 	    		}
 	    	}
@@ -384,6 +389,8 @@ var itpr = {
 	            if (turtle.speed > 100 && Kaylee.easing[itpr.commands[itpr.buffer[0].instruction].easing]) {
 	                percent = Kaylee.easing[itpr.commands[itpr.buffer[0].instruction].easing](percent, 0, 1, 1);
 	            }
+
+	            if (back) percent = 1 - percent;
 
 	            if (itpr.speedChanged) {
 	            	var lastDuration = itpr.buffer[0].duration;

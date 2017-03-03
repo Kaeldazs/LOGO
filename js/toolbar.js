@@ -30,6 +30,14 @@ Toolbar = function() {
 			_.activeBtn(_.btn.fast, 0);
 		});
 
+		_.genBtnImg('nextStep', 'img/next_step.png', function() {
+			if (itpr.interruption === false) {
+				itpr.interruption = 0;
+			}
+			itpr.interruption++;
+			itpr.play();
+		});
+
 		_.genBtnImg('lastStep', 'img/last_step.png', function() {
 			itpr.pause();
 

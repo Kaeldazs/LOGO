@@ -331,6 +331,8 @@ var itpr = {
 		itpr.speedChanged = true;
 	},
 
+	interruption: false,
+
 	// execution du buffer
 	execBuffer: function(animation) {
 		// if instruction in buffer
@@ -357,7 +359,7 @@ var itpr = {
 
 	    	// if instruction is running for the last time
 	    	if (time >= itpr.buffer[0].start + itpr.buffer[0].duration) {
-
+	   
 	    		itpr.commands[itpr.buffer[0].instruction].exec(1);
 
 	    		// move instruction to rendered instructions
@@ -366,6 +368,13 @@ var itpr = {
 		    		itpr.buffer[0].duration = undefined;
 		    		itpr.rI[itpr.rI.length] = itpr.buffer[0];
 		    		itpr.buffer.splice(0,1);
+	    		}
+	    		if (itpr.interruption ==! false) {
+	    			itpr.interruption--;
+	    			if (itpr.interruption === 0) {
+	    				itpr.pause();
+	    				itpr.interruption = false;
+	    			}
 	    		}
 	    	}
 

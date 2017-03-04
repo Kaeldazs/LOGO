@@ -23,15 +23,23 @@ var draw = {
 			c.ctx.lineTo(Math.round(turtle.width/2) + newPos.x, Math.round(turtle.height/2) + newPos.y);
 			c.ctx.lineTo(-Math.round(turtle.width/2) + newPos.x, Math.round(turtle.height/2) + newPos.y);
 			c.ctx.closePath();
+
+			if (turtle.shadow) {
+				c.ctx.shadowColor = 'rgba(0, 0, 0, '+ turtle.shadow +')';
+			    c.ctx.shadowBlur = 20 * turtle.shadow;
+			    c.ctx.shadowOffsetX = 10 * turtle.shadow;
+			    c.ctx.shadowOffsetY = 10 * turtle.shadow;
+			}
+
 			if (turtle.opacity != 1) {
-				c.ctx.globalAlpha = turtle.opacity;
-				c.ctx.fill();
-				c.ctx.stroke();			
+				c.ctx.globalAlpha = turtle.opacity;		
 			}
-			else {
-				c.ctx.fill();
-				c.ctx.stroke();
-			}
+			
+			c.ctx.fill();
+			c.ctx.shadowBlur = 0;
+			c.ctx.shadowOffsetX = 0;
+			c.ctx.shadowOffsetY = 0;
+			c.ctx.stroke();
 
 			// restoration du contexte initial
 			c.ctx.restore();

@@ -26,3 +26,11 @@ function removeClassName(className, selector) {
         if (els[i].classList.contains(className)) els[i].classList.remove(className);
     }
 }
+
+function inArray(needle, haystack) {
+    var length = haystack.length;
+    for(var i = 0; i < length; i++) {
+        if(haystack[i] == needle) return true;
+    }
+    return false;
+}

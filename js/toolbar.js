@@ -14,7 +14,15 @@ Toolbar = function() {
 		});
 
 		_.genBtnImg('backStep', 'img/back_step.png', function() {
+			if (itpr.rI.length > 0) {
+				itpr.pause();
+				itpr.interruption = -1;
+				itpr.buffer.splice(0, 0, itpr.rI.splice(-1)[0]);
+				itpr.redraw.rI();
 
+				itpr.buffer[0].start = undefined;
+			}
+			itpr.play();
 		});
 
 		_.genBtnImg('playPause', 'img/play.png', function() {
@@ -22,31 +30,16 @@ Toolbar = function() {
 		});
 
 		_.genBtnImg('stop', 'img/stop.png', function() {
-			itpr.toggle();
+			itpr.stop();
 		});
 		
 		_.genBtnImg('nextStep', 'img/next_step.png', function() {
-			if (itpr.interruption === false) {
-				itpr.interruption = 0;
-			}
-			itpr.interruption++;
+			itpr.interruption = 1;
 			itpr.play();
 		});
 
 		_.genBtnImg('lastStep', 'img/last_step.png', function() {
-			itpr.pause();
-
-			itpr.buffer = itpr.rI.slice(0).concat(itpr.buffer.slice(0));
-
-			canvasDraw.clear();
-
-			itpr.rI = [];
-			turtle.reset();
-			var length = itpr.buffer.length;
-			for (var i = 0; i < length; i++) itpr.execBuffer(false);
-			canvasTurtle.clear();
-
-			draw.turtle(canvasTurtle);
+			itpr.redraw.all();
 
 		});
 		_.genBtnImg('slow', 'img/slow.png', function() {
@@ -61,7 +54,6 @@ Toolbar = function() {
 		_.genBtnImg('fast', 'img/fast.png', function() {
 			_.activeBtn(_.btn.fast, 0);
 		});
-
 
 		document.body.appendChild(_.el);
 	}

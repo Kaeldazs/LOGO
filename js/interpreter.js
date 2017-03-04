@@ -5,6 +5,7 @@ var itpr = {
 			type: type of command (for syntaxic coloration),
 			reg: RegExp for find this command,
 			doc: documentation
+			easing: 'linear' by default
 			duration: animation duration
 			exec: what append when execute this command,
 			store: what append when storing this command on buffer
@@ -19,10 +20,8 @@ var itpr = {
 				var move = itpr.buffer[0].args * percent;
 				var newPos = Math.rotate(0, 0, 0, -move, turtle.a);
 				if (percent == 1) {
-
 					var newPosX = turtle.x + newPos.x,
 						newPosY = turtle.y + newPos.y;
-
 					if (turtle.draw) {
 						draw.line(canvasDraw, turtle.x, turtle.y, newPosX, newPosY);
 					}
@@ -75,6 +74,7 @@ var itpr = {
 			type: 'procedure',
 			reg: /^(TD)\s(-?[0-9]+(?:\.[0-9]+)?|:([a-zA-Z0-9_$]+))/,
 			doc: 'TD degrees // The turtle turns degrees to the right',
+			easing: 'ease',
 			duration: function() { return turtle.speed },
 			exec: function(percent) {
 				var move = itpr.buffer[0].args * percent;
@@ -94,6 +94,7 @@ var itpr = {
 			type: 'procedure',
 			reg: /^(TG)\s(-?[0-9]+(?:\.[0-9]+)?|:([a-zA-Z0-9_$]+))/,
 			doc: 'TG degrees // The turtle turns degrees to the left',
+			easing: 'ease',
 			duration: function() { return turtle.speed },
 			exec: function(percent) {
 				var move = -itpr.buffer[0].args * percent;
@@ -118,16 +119,36 @@ var itpr = {
 			type: 'procedure',
 			reg: /^(LC)/,
 			doc: 'LC // Pen up (no trace)',
-			exec: function() {
-				turtle.draw = false;
+			duration: function() { return turtle.speed },
+			exec: function(percent) {
+				var move = -itpr.buffer[0].args * percent;
+				if (percent == 1) {
+					turtle.draw = false;
+					turtle.shadow = 1;
+				}
+				else {
+					if (turtle.shadow !== 1) {
+						turtle.shadow = percent;
+					}
+				}
 			}
 		},
 		BC: {
 			type: 'procedure',
 			reg: /^(BC)/,
 			doc: 'BC // Pen down (trace active)',
-			exec: function() {
-				turtle.draw = true;
+			duration: function() { return turtle.speed },
+			exec: function(percent) {
+				var move = -itpr.buffer[0].args * percent;
+				if (percent == 1) {
+					turtle.draw = true;
+					turtle.shadow = 0;
+				}
+				else {
+					if (turtle.shadow !== 0) {
+						turtle.shadow = 1 - percent;
+					}
+				}
 			}
 		},
 		VE: {
@@ -185,7 +206,7 @@ var itpr = {
 			reg: /^(POUR)\s([^\s]+)(?:\s:(?:[a-zA-Z0-9_$]+))*/,
 			doc: '',
 			store: function(match) {
-				if (!itpr.capture) {
+				if (!itpr.capture && !inArray(match[2], itpr.primitives)) {
 					var argsRegex = /(\s:([a-zA-Z0-9_$]+))/g;
 					var args = match[0].match(argsRegex);
 					var regVar = '(?:'+ match[2] +')';
@@ -232,6 +253,15 @@ var itpr = {
 	// rendered instructions
 	rI: [],
 
+	primitives: [],
+	protectPrimitives: function() {
+		var tmp = [];
+		for (var p in itpr.commands) {
+			tmp[tmp.length] = p;
+		}
+		itpr.primitives = tmp;
+	},
+
 	store: function(match) {
 		// si la capture de l'instruction est déléguée
 		if (itpr.capture) {
@@ -272,7 +302,7 @@ var itpr = {
 			turtle.y += turtle.currentMoveY;
 			turtle.currentMoveX = 0;
 			turtle.currentMoveY = 0;
-			var turtlePos = [turtle.x, turtle.y, turtle.a % 360, turtle.opacity];
+			var turtlePos = [turtle.x, turtle.y, turtle.a % 360, turtle.opacity, turtle.shadow];
 			Kaylee.animate(function(start, curr) {
 				var percent = ((curr - start) / 300);
 	            percent = Kaylee.easing['ease'](percent, 0, 1, 1);
@@ -280,6 +310,7 @@ var itpr = {
 	            turtle.y = turtlePos[1] * (1 - percent);
 	            turtle.a = turtlePos[2] * (1 - percent);
 	            turtle.opacity = turtlePos[3] + (1 - turtlePos[3]) * percent;
+	            turtle.shadow = turtlePos[4] * (1 - percent);
 
 	            canvasTurtle.clear();
 				draw.turtle(canvasTurtle);
@@ -287,6 +318,7 @@ var itpr = {
 	            canvasDraw.el.style.opacity = 1 - percent;
 	            if (curr - start > 300) {
 	            	this.stop();
+	            	turtle.shadow = 0;
 	            	turtle.reset();
 					canvasDraw.clear();
 					canvasTurtle.clear();
@@ -319,6 +351,15 @@ var itpr = {
 		!animLoop.isRunning() && itpr.buffer.length > 0 ? itpr.play() : itpr.pause();
 	},
 
+	stop: function() {
+		if (!animLoop.isRunning()) {
+			itpr.buffer.splice(0);
+		}
+		else {
+			itpr.buffer.splice(1, itpr.buffer.length - 1);
+		}
+	},
+
 	speedChanged: false,
 	speed: function(speed) {
 		if (speed == 0) {
@@ -330,13 +371,10 @@ var itpr = {
 		itpr.speedChanged = true;
 	},
 
-	interruption: {
-		front: false,
-		back: false
-	},
+	interruption: 0,
 
 	// execution du buffer
-	execBuffer: function(animation, back) {
+	execBuffer: function(animation, redraw) {
 
 		// if instruction in buffer
 	    if (itpr.buffer.length > 0 && itpr.buffer[0]) {
@@ -362,24 +400,18 @@ var itpr = {
 
 	    	// if instruction is running for the last time
 	    	if (time >= itpr.buffer[0].start + itpr.buffer[0].duration) {
-	   
-	    		itpr.commands[itpr.buffer[0].instruction].exec(back ? 0 : 1);
 
+	    		itpr.commands[itpr.buffer[0].instruction].exec(!redraw && itpr.interruption === -1 ? 0 : 1);
 	    		// move instruction to rendered instructions
 	    		if (itpr.buffer[0] && itpr.rI) {
 	    			itpr.buffer[0].start = undefined;
 		    		itpr.buffer[0].duration = undefined;
-		    		itpr.rI[itpr.rI.length] = itpr.buffer[0];
-		    		itpr.buffer.splice(0, 1);
+		    		itpr.rI[itpr.rI.length] = itpr.buffer.splice(0, 1)[0];
 	    		}
 
-	    		var direction = back ? 'back' : 'front';
-	    		if (itpr.interruption[direction] ==! false) {
-	    			itpr.interruption[direction]--;
-	    			if (itpr.interruption[direction] === 0) {
-	    				itpr.pause();
-	    				itpr.interruption[direction] = false;
-	    			}
+	    		if (!redraw && itpr.interruption !== 0) {
+	    			itpr.pause();
+	    			itpr.interruption = 0;
 	    		}
 	    	}
 
@@ -390,8 +422,7 @@ var itpr = {
 	                percent = Kaylee.easing[itpr.commands[itpr.buffer[0].instruction].easing](percent, 0, 1, 1);
 	            }
 
-	            if (back) percent = 1 - percent;
-
+	            if (!redraw && itpr.interruption === -1) percent = 1 - percent;
 	            if (itpr.speedChanged) {
 	            	var lastDuration = itpr.buffer[0].duration;
 	            	itpr.buffer[0].duration = itpr.commands[itpr.buffer[0].instruction].duration();
@@ -463,8 +494,58 @@ var itpr = {
 			}
 		}
 		shell.setMode();
+	},
+
+	redraw: {
+		rI: function() {
+			itpr.pause();
+			canvasDraw.clear();
+
+			var tmpBuffer = itpr.buffer.slice(0);
+		    var tmprI = itpr.rI.slice(0);
+		    itpr.buffer = itpr.rI.slice(0);
+
+	        // reset buffer and turtle properties
+	        itpr.rI = [];
+	        turtle.reset();
+
+	        // execute rendered instructions
+	        var length = itpr.buffer.length;
+
+	        for (var i = 0; i < length; i++) {
+	        	itpr.execBuffer(false, true);
+	        }
+
+	        // reset buffer and rendered instructions
+	        itpr.buffer = tmpBuffer,
+	        itpr.rI = tmprI;
+
+	        canvasTurtle.clear();
+
+	        // draw turtle
+			draw.turtle(canvasTurtle);
+		},
+		all: function() {
+			itpr.pause();
+
+			itpr.buffer = itpr.rI.slice(0).concat(itpr.buffer.slice(0));
+
+			canvasDraw.clear();
+
+			itpr.rI = [];
+			turtle.reset();
+			var length = itpr.buffer.length;
+			for (var i = 0; i < length; i++) itpr.execBuffer(false, true);
+			canvasTurtle.clear();
+
+			draw.turtle(canvasTurtle);
+		}
 	}
-}
+};
+
+(function() {
+    itpr.protectPrimitives();
+})();
 
 // REPETE 18 [TD 20 REPETE 18 [TD 20 AV 20]]
 // REPETE 18 [AV 100 TD 100] CT

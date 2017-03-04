@@ -56,26 +56,8 @@ Events = {
 	            // set canvas sizes
 	            canvasDraw.setSize();
 	            canvasTurtle.setSize();
-	            var tmpBuffer = itpr.buffer.slice(0);
-	            var tmprI = itpr.rI.slice(0);
-	            itpr.buffer = itpr.rI.slice(0);
-
-	            // reset buffer and turtle properties
-	            itpr.rI = [];
-	            turtle.reset();
-
-	            // execute rendered instructions
-	            var length = tmprI.length
-	            for (var i = 0; i < length; i++) {
-	            	itpr.execBuffer(false);
-	            }
-
-	            // reset buffer and rendered instructions
-	            itpr.buffer = tmpBuffer,
-	            itpr.rI = tmprI;
-
-	            // draw turtle
-    			draw.turtle(canvasTurtle);
+	            
+	            itpr.redraw.rI();
 
 	            // restart if was running
 	            if (!paused) {

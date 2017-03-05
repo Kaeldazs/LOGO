@@ -24,7 +24,8 @@ canvas {
     color: #00d700;
     font-family: 'Arial';
     box-sizing: border-box;
-    padding: 14px
+    padding: 14px;
+    cursor: default;
 }
 
 @keyframes blink {

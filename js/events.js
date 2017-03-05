@@ -57,11 +57,11 @@ Events = {
 	            // set canvas sizes
 	            canvasDraw.setSize();
 	            canvasTurtle.setSize();
+	            canvasMG.setSize();
 	            if (mG.current) {
-	            	canvasMG.setSize();
+	            	mG.current.draw();
 	            }
 	            
-	            mG.current.draw();
 	            itpr.redraw.rI();
 
 	            // restart if was running

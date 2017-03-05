@@ -16,7 +16,7 @@ var itpr = {
 			doc: 'AV pixels // The turtle moves pixels foward',
 			duration: function() { return turtle.speed },
 			easing: 'ease',
-			exec: function(percent) {
+			exec: function(percent, redraw) {
 				var move = itpr.buffer[0].args * percent;
 				var newPos = Math.rotate(0, 0, 0, -move, turtle.a);
 
@@ -25,7 +25,7 @@ var itpr = {
 						newPosY = turtle.y + newPos.y;
 					if (turtle.draw) {
 						draw.line(canvasDraw, turtle.x, turtle.y, newPosX, newPosY);
-						if (mG.current && mG.current.checkMove) {
+						if (mG.current && mG.current.checkMove && !redraw) {
 							mG.current.checkMove(turtle.x, turtle.y, newPosX, newPosY);
 						}
 					}
@@ -50,7 +50,7 @@ var itpr = {
 			doc: 'RE pixels // The turtle moves pixels backward',
 			duration: function() { return turtle.speed },
 			easing: 'ease',
-			exec: function(percent) {
+			exec: function(percent, redraw) {
 				var move = itpr.buffer[0].args * percent;
 				var newPos = Math.rotate(0, 0, 0, move, turtle.a);
 				if (percent == 1) {
@@ -60,7 +60,7 @@ var itpr = {
 
 					if (turtle.draw) {
 						draw.line(canvasDraw, turtle.x, turtle.y, newPosX, newPosY);
-						if (mG.current && mG.current.checkMove) {
+						if (mG.current && mG.current.checkMove && !redraw) {
 							mG.current.checkMove(turtle.x, turtle.y, newPosX, newPosY);
 						}
 					}
@@ -344,12 +344,15 @@ var itpr = {
 				draw.turtle(canvasTurtle);
 
 	            canvasDraw.el.style.opacity = 1 - percent;
+	            canvasMG.el.style.opacity = 1 - percent;
 	            if (curr - start > 300) {
 	            	this.stop();
 	            	turtle.reset();
 					canvasDraw.clear();
+					canvasMG.clear();
 					canvasTurtle.clear();
 					canvasDraw.el.style.opacity = '';
+					canvasMG.el.style.opacity = '';
 					draw.turtle(canvasTurtle);
 					if (callback) callback();
 	            }
@@ -429,7 +432,7 @@ var itpr = {
 	    	// if instruction is running for the last time
 	    	if (time >= itpr.buffer[0].start + itpr.buffer[0].duration) {
 
-	    		itpr.commands[itpr.buffer[0].instruction].exec(!redraw && itpr.interruption === -1 ? 0 : 1);
+	    		itpr.commands[itpr.buffer[0].instruction].exec(!redraw && itpr.interruption === -1 ? 0 : 1, redraw);
 	    		// move instruction to rendered instructions
 	    		if (itpr.buffer[0] && itpr.rI) {
 	    			itpr.buffer[0].start = undefined;
@@ -463,7 +466,7 @@ var itpr = {
 
 	            	itpr.speedChanged = false;
 	            }
-	    		if (percent) itpr.commands[itpr.buffer[0].instruction].exec(percent);
+	    		if (percent) itpr.commands[itpr.buffer[0].instruction].exec(percent, redraw);
 	    	}
 	    }
 	    // if buffer is empty
@@ -524,6 +527,37 @@ var itpr = {
 		shell.setMode();
 	},
 
+	iR2MG: function() {
+		var x = y = a = 0;
+		var d = true;
+		var dump = [[x, y]];
+		var c, newPos;
+		for (var i = 0; i < itpr.rI.length; i++) {
+			c = itpr.rI[i];
+
+			if (c.instruction == 'AV') {
+				newPos = Math.translate(x, y, parseInt(c.args), a);
+				x = Math.round(newPos.x * 100)/100, y = Math.round(newPos.y * 100)/100;
+				dump[dump.length] = [x, y];
+			}
+			else if (c.instruction == 'RE') {
+				newPos = Math.translate(x, y, -parseInt(c.args), a);
+				x = Math.round(newPos.x * 100)/100, y = Math.round(newPos.y * 100)/100;
+				dump[dump.length] = [x, y];
+			}
+			else if (c.instruction == 'TD') {
+				a += parseInt(c.args);
+			}
+			else if (c.instruction == 'TG') {
+				a -= parseInt(c.args);
+			}
+			else if (c.instruction == 'LC') {
+				dump[dump.length] = false;
+			}
+		}
+		console.log(JSON.stringify(dump));
+	},
+
 	redraw: {
 		rI: function() {
 			itpr.pause();
@@ -578,4 +612,4 @@ var itpr = {
 // REPETE 18 [TD 20 REPETE 18 [TD 20 AV 20]]
 // REPETE 18 [AV 100 TD 100] CT
 
-// POUR rect :x :y CT REPETE :y [AV :x TD 180 AV :x TG 90 AV 1 TG 90] MC FIN rect 100 10
+// POUR rect :x :y CT REPETE :y [AV :x TD 180 AV :x TG 90 AV 1 TG 90] MT FIN rect 100 10

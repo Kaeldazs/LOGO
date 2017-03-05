@@ -530,20 +530,33 @@ var itpr = {
 	iR2MG: function() {
 		var x = y = a = 0;
 		var d = true;
-		var dump = [[x, y]];
+		var dump = [];
+		var move = false;
 		var c, newPos;
 		for (var i = 0; i < itpr.rI.length; i++) {
 			c = itpr.rI[i];
 
 			if (c.instruction == 'AV') {
+				if (!move && d) {
+					move = true;
+					dump = [[x, y]];
+				}
 				newPos = Math.translate(x, y, parseInt(c.args), a);
 				x = Math.round(newPos.x * 100)/100, y = Math.round(newPos.y * 100)/100;
-				dump[dump.length] = [x, y];
+				if (d) {
+					dump[dump.length] = [x, y];
+				}
 			}
 			else if (c.instruction == 'RE') {
+				if (!move && d) {
+					move = true;
+					dump = [[x, y]];
+				}
 				newPos = Math.translate(x, y, -parseInt(c.args), a);
 				x = Math.round(newPos.x * 100)/100, y = Math.round(newPos.y * 100)/100;
-				dump[dump.length] = [x, y];
+				if (d) {
+					dump[dump.length] = [x, y];
+				}
 			}
 			else if (c.instruction == 'TD') {
 				a += parseInt(c.args);
@@ -553,6 +566,11 @@ var itpr = {
 			}
 			else if (c.instruction == 'LC') {
 				dump[dump.length] = false;
+				d = false;
+			}
+			else if (c.instruction == 'BC') {
+				d = true;
+				dump[dump.length] = [x, y];
 			}
 		}
 		console.log(JSON.stringify(dump));

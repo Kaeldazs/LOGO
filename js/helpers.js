@@ -10,6 +10,29 @@ Math.rotate = function(cx, cy, x, y, angle) {
     };
 };
 
+// angle entre deux points
+Math.getAngle = function(x1, y1, x2, y2) {
+    var angle = (Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI) - 90;
+    if (angle < 0) {
+        angle += 360;
+    }
+    return angle;
+};
+
+// position d'un point après translation
+Math.translate = function(x, y, distance, angle) {
+    angle = Math.PI * (angle - 90) / 180.0;
+    return {
+        x: x + distance * Math.cos(angle),
+        y: y + distance * Math.sin(angle)
+    };
+};
+
+// distance entre deux points
+Math.distPoints = function(x1, y1, x2, y2) {
+    return Math.sqrt(Math.pow((x1 - x2), 2) + Math.pow((y1 - y2), 2));
+};
+
 function trimWhiteSpace(str) {
 	while (str[0] == ' ') {
 		str = str.replace(/^ /,'');

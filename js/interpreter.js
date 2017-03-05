@@ -111,8 +111,21 @@ var itpr = {
 			type: 'procedure',
 			reg: /^(FCC)\s(#([[0-9A-Fa-f]{6}|[[0-9A-Fa-f]{3}))/,
 			doc: 'FCC color // Change the trace color to color in RGB format as #FF0000 for red',
-			exec: function() {
-				turtle.colorLine = itpr.buffer[0].args;
+			easing: 'ease',
+			duration: function() { return turtle.speed },
+			exec: function(percent) {
+				var color = Kaylee.hex2rgb(itpr.buffer[0].args);
+				if (percent == 1) {
+					turtle.colorLine = color;
+					turtle.currentColorMove = [0, 0, 0];
+				}
+				else {
+					turtle.currentColorMove = [
+						(turtle.colorLine[0] - color[0]) * percent,
+						(turtle.colorLine[1] - color[1]) * percent,
+						(turtle.colorLine[2] - color[2]) * percent,
+					]
+				}
 			}
 		},
 		LC: {
@@ -283,7 +296,7 @@ var itpr = {
 	},
 
 	// reset all
-	clear: function(animate) {
+	clear: function(animate, callback) {
 		if (shell.clearCanvas) {
 			turtle.speed = turtle.speedInitial;
 			shell.clearCanvas = false;
@@ -312,18 +325,24 @@ var itpr = {
 	            turtle.opacity = turtlePos[3] + (1 - turtlePos[3]) * percent;
 	            turtle.shadow = turtlePos[4] * (1 - percent);
 
+	            turtle.currentColorMove = [
+					(turtle.colorLine[0] - 255) * percent,
+					(turtle.colorLine[1] - 255) * percent,
+					(turtle.colorLine[2] - 255) * percent,
+				]
+
 	            canvasTurtle.clear();
 				draw.turtle(canvasTurtle);
 
 	            canvasDraw.el.style.opacity = 1 - percent;
 	            if (curr - start > 300) {
 	            	this.stop();
-	            	turtle.shadow = 0;
 	            	turtle.reset();
 					canvasDraw.clear();
 					canvasTurtle.clear();
 					canvasDraw.el.style.opacity = '';
 					draw.turtle(canvasTurtle);
+					if (callback) callback();
 	            }
 			});
 		}

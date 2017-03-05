@@ -14,7 +14,7 @@ var draw = {
 			var newPos = Math.rotate(0, 0, turtlePos[0], turtlePos[1], -turtlePos[2]);
 
 			// dessin de la tortue
-			c.ctx.fillStyle = turtle.colorLine;
+			c.ctx.fillStyle = 'rgb('+ turtle.getColorLine().join() +')';
 			c.ctx.strokeStyle = "black";
 			c.ctx.lineWidth = 3;
 			c.ctx.lineJoin = "round";
@@ -46,6 +46,7 @@ var draw = {
 		}
 	},
 	line: function(c, x1, y1, x2, y2) {
+
 		// if pen is down
 		if (turtle.draw) {
 			// calculs des positions
@@ -61,8 +62,8 @@ var draw = {
 			var newPos2 = Math.rotate(0, 0, x2, y2, turtlePos[2]);
 
 			// dessin de la ligne
-			c.ctx.strokeStyle = turtle.colorLine;
-			c.ctx.lineWidth = 2;
+			c.ctx.strokeStyle = 'rgb('+ turtle.getColorLine().join() +')';
+			c.ctx.lineWidth = 2 * c.pxRatio;
 			c.ctx.beginPath();
 			c.ctx.moveTo(newPos1.x, newPos1.y);
 			c.ctx.lineTo(newPos2.x, newPos2.y);

@@ -1,7 +1,492 @@
-window.requestAnimFrame=function(){return window.requestAnimationFrame||window.webkitRequestAnimationFrame||window.mozRequestAnimationFrame||function(b){window.setTimeout(b,1E3/60)}}();
-Kaylee={run:!1,inc:0,inArray:function(b,a){for(var c=a.length,d=0;d<c;d++)if(a[d]==b)return!0;return!1},limitator:function(b,a,c,d){d||(b=Math.round(b));return b<a?a:b>c?c:b},prepare:function(b,a,c,d){if("function"==typeof b)return a||(a={}),a.prepare=!0,Kaylee.add(b,a);d||(d={});d.prepare=
-!0;d.id||(d.id="Kaylee-"+this.inc++);b=window.jQuery&&b instanceof jQuery?b[0]:b;Kaylee.animate(b,a,c,d);return this.instance(d.id)},animate:function(b,a,c,d){if("function"==typeof b)return Kaylee.add(b,a);this.add(anim,{duration:c,id:d.id,prepare:d.prepare,callback:function(){end();d.callback&&d.callback()}});return this.instance(d.id)},rmFromArr:function(b,a,c){c=b.slice((c||a)+1||b.length);b.length=0>a?b.length+a:a;return b.push.apply(b,c)},toggle:function(b){Kaylee.pause(b)||Kaylee.play(b)},pause:function(b){if(b)for(var a=
-0;a<this.running.length;a++)if(this.running[a].id==b)return this.running[a].p=Date.now(),this.paused[this.paused.length]=this.running[a],this.rmFromArr(this.running,a),!0;return!1},play:function(b){Kaylee.pause(b);if(b)for(var a=0;a<this.paused.length;a++)if(this.paused[a].id==b)return this.paused[a].end=void 0,this.running[this.running.length]=this.paused[a],this.rmFromArr(this.paused,a),this.run||this.loop(),!0;return!1},stop:function(b){if(b)for(var a=0;a<this.running.length;a++){if(this.running[a].id==
-b){this.rmFromArr(this.running,a);break}}else this.running=[]},isRunning:function(b){for(var a=0;a<this.running.length;a++)if(this.running[a].id==b)return!0;return!1},instance:function(b){return{isRunning:function(){return Kaylee.isRunning(b)},stop:function(){Kaylee.stop(b)},pause:function(){Kaylee.pause(b)},play:function(){Kaylee.play(b)},toggle:function(){Kaylee.toggle(b)}}},add:function(b,a){a||(a={});var c=Date.now(),d;a.prepare&&(d=c);a.id||(a.id="Kaylee-"+this.inc++);c={id:a.id,func:b,duration:a.duration,
-end:void 0,start:c,p:d,stop:function(){Kaylee.stop(a.id)},pause:function(){Kaylee.pause(a.id)},callback:a.callback};a.prepare?this.paused[this.paused.length]=c:this.running[this.running.length]=c;this.run||this.loop();return this.instance(a.id)},loop:function(){this.run=!0;for(var b=Date.now(),a=0;a<this.running.length;a++){if(this.running[a].duration&&!this.running[a].end)if(this.running[a].p){var c=b-(this.running[a].p-this.running[a].start);this.running[a].end=c+this.running[a].duration;this.running[a].start=
-c;this.running[a].p=void 0}else this.running[a].end=b+this.running[a].duration,this.running[a].start=b;this.running[a].end<b?(this.running[a].callback&&this.running[a].callback(),this.rmFromArr(this.running,a)):this.running[a].func&&this.running[a].func(this.running[a].start,b)}this.running.length?requestAnimFrame(function(){Kaylee.loop()}):this.run=!1},running:[],paused:[],easing:{linear:function(b,a,c,d){return(c-a)/d*b},ease:function(b,a,c,d){return 1>(b/=d/2)?c/2*b*b+a:-c/2*(--b*(b-2)-1)+a}}};
+window.requestAnimFrame = (function() {
+	  return  window.requestAnimationFrame	   ||
+			window.webkitRequestAnimationFrame ||
+			window.mozRequestAnimationFrame	||
+			function(callback) {
+				window.setTimeout(callback, 1000 / 60);
+			};
+})();
+
+Kaylee = {
+	run: false,
+	inc: 0,
+
+	transformStyle: [
+		'scale', 'scaleX', 'scaleY', 'rotate', 'rotateX', 'rotateY', 'rotateZ', 
+		'skewX', 'skewY', 'perspective', 'translateX', 'translateY', 'translateZ', 'scaleZ'
+	],
+	
+	colorStyle: [
+		'color', 'background-color', 'background', 'border-color'
+	],
+			
+	inArray: function(needle, haystack) {
+		var length = haystack.length;
+		for(var i = 0; i < length; i++) {
+			if(haystack[i] == needle) return true;
+		}
+		return false;
+	},
+	limitator: function(nb, min, max, float) {
+		if (!float) nb = Math.round(nb);
+		if (nb < min) return min;
+		if (nb > max) return max;
+		return nb;
+	},
+	prepare: function(elem, args, duration, options) {
+		if (typeof elem == "function") {
+			if (!args) args = {};
+			args.prepare = true;
+			return Kaylee.add(elem, args);
+		}
+		if (!options) options = {};
+		options.prepare = true;
+		if (!options.id) {
+			options.id = 'Kaylee-' + (this.inc++);
+		}
+		elem = window.jQuery && elem instanceof jQuery ? elem[0] : elem;
+		Kaylee.animate(elem, args, duration, options);
+		return this.instance(options.id);
+	},
+	hex2rgb: function(hex) {
+	    var tmpColor = hex;
+	    var color;
+	    if (tmpColor.length == 4) {
+	        color = '#';
+	        color += tmpColor[1] + tmpColor[1];
+	        color += tmpColor[2] + tmpColor[2];
+	        color += tmpColor[3] + tmpColor[3];
+	    }
+	    else color = hex;
+	    var r = parseInt(color.substr(1, 2), 16),
+	        g = parseInt(color.substr(3, 2), 16),
+	        b = parseInt(color.substr(5, 2), 16); 
+	    return [r, g, b];
+	},
+	animate: function(elem, args, duration, options) {
+		if (typeof elem == "function") return Kaylee.add(elem, args);
+		if (!options) options = {};
+		if (elem.length === undefined) {
+			elem = [elem];
+		}
+		if (!elem || !args || !duration) {
+			if (options.callback) {
+				options.callback(elem);
+			};
+			return;
+		}
+		if (!options.id) {
+			options.id = 'Kaylee-' + (this.inc++);
+		}
+
+		for (var i = 0; i < args.length; i++) {
+			if (options.reverse) {
+				var tmp = args[i].from;
+				args[i].from = args[i].to;
+				args[i].to = tmp;
+			}
+			if (!args[i].ease || !Kaylee.easing[args[i].ease]) args[i].ease = 'ease';
+			if (!args[i].unit) args[i].unit = '';
+			if (this.inArray(args[i].style, this.colorStyle)) {
+				alpha = false;
+				var arr = ['from', 'to'];
+				for (var j = 0; j < 2; j++) {
+					if (!Array.isArray(args[i][arr[j]]) && args[i][arr[j]].match(/^\#/)) {		
+						args[i][arr[j]] = Kaylee.hex2rgb(args[i][arr[j]]);
+					}
+					else if (!Array.isArray(args[i][arr[j]]) && args[i][arr[j]].match(/^rgba?\(/)) {
+						args[i][arr[j]] = args[i][arr[j]].replace(/^(rgba?\()|(\))|( )/img, '').split(',');
+						args[i][arr[j]][0] = parseInt(args[i][arr[j]][0]);
+						args[i][arr[j]][1] = parseInt(args[i][arr[j]][1]);
+						args[i][arr[j]][2] = parseInt(args[i][arr[j]][2]);
+						if (args[i][arr[j]][3] !== undefined) {
+							alpha = true;
+							args[i][arr[j]][3] = parseFloat(args[i][arr[j]][3]);
+						}
+					}
+				}
+				args[i].diff = [
+					args[i].to[0] - args[i].from[0],
+					args[i].to[1] - args[i].from[1],
+					args[i].to[2] - args[i].from[2]
+				];
+				if (alpha || (args[i].from[3] !== undefined && args[i].to[3] !== undefined)) {
+					args[i].type = 'rgba';
+					if (args[i].from[3] === undefined) args[i].from[3] = 1;
+					if (args[i].to[3] === undefined) args[i].to[3] = 1;
+					args[i].diff[3] = args[i].to[3] - args[i].from[3];
+					args[i].pre = 'rgba(';
+				}
+				else {
+					args[i].type = 'rgb';
+					args[i].pre = 'rgb(';
+				}
+				args[i].unit = ')';
+			}
+			else {
+				if (this.inArray(args[i].style, this.transformStyle)) {
+					args[i].pre = args[i].style + '(';
+					args[i].unit += ')';
+					args[i].style = 'transform';
+				}
+				args[i].diff = args[i].to - args[i].from;
+			}
+			if (!args[i].pre) {
+				args[i].pre = '';
+			}
+			for (var el = 0; el < elem.length; el++) {
+				elem[el].style[args[i].style] = args[i].from + args[i].unit;
+			}
+		};
+		
+		var end = function() {
+			var transformTxt = '';
+			for (var i = 0; i < args.length; i++) {
+				args[i].value = args[i].pre + args[i].to + args[i].unit;
+				if (args[i].style == 'transform') {
+					transformTxt += args[i].value + ' ';
+				}
+				else {
+					for (var el = 0; el < elem.length; el++) {
+						elem[el].style[args[i].style] = args[i].value;
+					}
+				}
+			}
+			if (transformTxt != '') {
+				for (var el = 0; el < elem.length; el++) {
+					elem[el].style.transform = transformTxt;
+					elem[el].style.webkitTransform = transformTxt;
+					elem[el].style.MozTransform = transformTxt;
+					elem[el].style.msTransform = transformTxt;
+					elem[el].style.OTransform = transformTxt;
+				}
+			}
+			if (options.loop) {
+				options.reverse = true;
+				Kaylee.animate(elem, args, duration, options);
+			}
+		};
+
+		var anim = function(start, current) {
+			var transformTxt = '';
+			for (var i = 0; i < args.length; i++) {
+				if (args[i].type == 'rgb' || args[i].type == 'rgba') {
+					args[i].value = args[i].pre + 
+						Kaylee.limitator(args[i].from[0] + 
+						Kaylee.easing[args[i].ease](current - start, 0, args[i].diff[0], duration), 0, 255) + ',' + 
+						Kaylee.limitator(args[i].from[1] + 
+						Kaylee.easing[args[i].ease](current - start, 0, args[i].diff[1], duration), 0, 255) + ',' +
+						Kaylee.limitator(args[i].from[2] + 
+						Kaylee.easing[args[i].ease](current - start, 0, args[i].diff[2], duration), 0, 255) +
+						(args[i].type == 'rgba' ? ','+ (args[i].from[3] + 
+						Kaylee.easing[args[i].ease](current - start, 0, args[i].diff[3], duration)) : '') +
+						args[i].unit;
+						
+					for (var el = 0; el < elem.length; el++) {
+						elem[el].style[args[i].style] = args[i].value;
+					}
+				}
+				else {
+					args[i].value = args[i].pre + 
+						(args[i].from + Kaylee.easing[args[i].ease](current - start, 0, args[i].diff, duration)) + 
+						args[i].unit;
+					if (args[i].style == 'transform') {
+						transformTxt += args[i].value + ' ';
+					}
+					else {
+						for (var el = 0; el < elem.length; el++) {
+							elem[el].style[args[i].style] = args[i].value;
+						}
+					}
+				}
+			}
+			if (transformTxt != '') {
+				for (var el = 0; el < elem.length; el++) {
+					elem[el].style.transform = transformTxt;
+					elem[el].style.webkitTransform = transformTxt;
+					elem[el].style.MozTransform = transformTxt;
+					elem[el].style.msTransform = transformTxt;
+					elem[el].style.OTransform = transformTxt;
+				}
+			}
+		};
+		
+		this.add(anim, {
+			duration: duration,
+			id: options.id,
+			prepare: options.prepare,
+			callback: function() {
+				end();
+				if (options.callback) options.callback();
+			}
+		});
+		return this.instance(options.id);
+	},
+	rmFromArr: function(arr, from, to) {
+		var rest = arr.slice((to || from) + 1 || arr.length);
+		arr.length = from < 0 ? arr.length + from : from;
+		return arr.push.apply(arr, rest);
+	},
+	toggle: function(id) {
+		if (!Kaylee.pause(id)) Kaylee.play(id);
+	},
+	pause: function(id) {
+		if (id) {
+			for (var i = 0; i < this.running.length; i++) {
+				if (this.running[i].id == id) {
+					this.running[i].p = Date.now();
+					this.paused[this.paused.length] = this.running[i];
+					this.rmFromArr(this.running, i);
+					return true;
+				}
+			}
+		}
+		return false;
+	},
+	play: function(id) {
+		Kaylee.pause(id);
+		if (id) {
+			for (var i = 0; i < this.paused.length; i++) {
+				if (this.paused[i].id == id) {
+					this.paused[i].end = undefined;
+					this.running[this.running.length] = this.paused[i];
+					this.rmFromArr(this.paused, i);
+					if (!this.run) {
+						this.loop();
+					}
+					return true;
+				}
+			}
+		}
+		return false;
+	},
+	stop: function(id) {
+		if (id) {
+			for (var i = 0; i < this.running.length; i++) {
+				if (this.running[i].id == id) {
+					this.rmFromArr(this.running, i);
+					break;
+				}
+			}
+		}
+		else {
+			this.running = [];
+		}
+	},
+	isRunning: function(id) {
+		for (var i = 0; i < this.running.length; i++) {
+			if (this.running[i].id == id) {
+				return true;
+			}
+		}
+		return false;
+	},
+	instance: function(id) {
+		return {
+			isRunning: function() {
+				return Kaylee.isRunning(id);
+			},
+			stop: function() {
+				Kaylee.stop(id);
+			},
+			pause: function() {
+				Kaylee.pause(id);
+			},
+			play: function() {
+				Kaylee.play(id);
+			},
+			toggle: function() {
+				Kaylee.toggle(id);
+			}
+		};
+	},
+	add: function(func, args) {
+		if (!args) args = {};
+		var start = Date.now(), pause;
+		if (args.prepare) pause = start;
+		if (!args.id) args.id = 'Kaylee-' + (this.inc++);
+		var tmp = {
+			id: args.id,
+			func: func,
+			duration: args.duration,
+			end: undefined,
+			start: start,
+			p: pause,
+			stop: function(){Kaylee.stop(args.id)},
+			pause: function(){Kaylee.pause(args.id)},
+			callback: args.callback
+		}
+		if (args.prepare) {
+			this.paused[this.paused.length] = tmp;
+		}
+		else {
+			this.running[this.running.length] = tmp;
+		}
+		if (!this.run) {
+			this.loop();
+		}
+		return this.instance(args.id);
+	},
+	loop: function() {
+		this.run = true;
+		var curr = Date.now();
+		for (var i = 0; i < this.running.length; i++) {
+			if (this.running[i].duration && !this.running[i].end) {
+				if (this.running[i].p) {
+					var newCurr = curr - (this.running[i].p - this.running[i].start);
+					this.running[i].end = newCurr + this.running[i].duration;
+					this.running[i].start = newCurr;
+					this.running[i].p = undefined;
+				}
+				else {
+					this.running[i].end = curr + this.running[i].duration;
+					this.running[i].start = curr;
+				}
+			}
+			if (this.running[i].end < curr) {
+				if (this.running[i].callback) this.running[i].callback();
+				this.rmFromArr(this.running, i);
+			}
+			else {
+				if (this.running[i].func) this.running[i].func(this.running[i].start, curr);
+			}
+		}
+		if (this.running.length) {
+			requestAnimFrame(function() {
+				Kaylee.loop();
+			});
+		}
+		else {
+			this.run = false;
+		}
+	},
+	running: [],
+	paused: []
+};
+
+Kaylee.easing = {
+	easeInQuad: function(t, b, c, d) {
+		return c*(t/=d)*t + b;
+	},
+	easeOutQuad: function(t, b, c, d) {
+		return -c *(t/=d)*(t-2) + b;
+	},
+	easeInOutQuad: function(t, b, c, d) {
+		if ((t/=d/2) < 1) return c/2*t*t + b;
+		return -c/2 * ((--t)*(t-2) - 1) + b;
+	},
+	easeInCubic: function(t, b, c, d) {
+		return c*(t/=d)*t*t + b;
+	},
+	easeOutCubic: function(t, b, c, d) {
+		return c*((t=t/d-1)*t*t + 1) + b;
+	},
+	easeInOutCubic: function(t, b, c, d) {
+		if ((t/=d/2) < 1) return c/2*t*t*t + b;
+		return c/2*((t-=2)*t*t + 2) + b;
+	},
+	easeInQuart: function(t, b, c, d) {
+		return c*(t/=d)*t*t*t + b;
+	},
+	easeOutQuart: function(t, b, c, d) {
+		return -c * ((t=t/d-1)*t*t*t - 1) + b;
+	},
+	easeInOutQuart: function(t, b, c, d) {
+		if ((t/=d/2) < 1) return c/2*t*t*t*t + b;
+		return -c/2 * ((t-=2)*t*t*t - 2) + b;
+	},
+	easeInQuint: function(t, b, c, d) {
+		return c*(t/=d)*t*t*t*t + b;
+	},
+	easeOutQuint: function(t, b, c, d) {
+		return c*((t=t/d-1)*t*t*t*t + 1) + b;
+	},
+	easeInOutQuint: function(t, b, c, d) {
+		if ((t/=d/2) < 1) return c/2*t*t*t*t*t + b;
+		return c/2*((t-=2)*t*t*t*t + 2) + b;
+	},
+	easeInSine: function(t, b, c, d) {
+		return -c * Math.cos(t/d * (Math.PI/2)) + c + b;
+	},
+	easeOutSine: function(t, b, c, d) {
+		return c * Math.sin(t/d * (Math.PI/2)) + b;
+	},
+	easeInOutSine: function(t, b, c, d) {
+		return -c/2 * (Math.cos(Math.PI*t/d) - 1) + b;
+	},
+	easeInExpo: function(t, b, c, d) {
+		return (t==0) ? b : c * Math.pow(2, 10 * (t/d - 1)) + b;
+	},
+	easeOutExpo: function(t, b, c, d) {
+		return (t==d) ? b+c : c * (-Math.pow(2, -10 * t/d) + 1) + b;
+	},
+	easeInOutExpo: function(t, b, c, d) {
+		if (t==0) return b;
+		if (t==d) return b+c;
+		if ((t/=d/2) < 1) return c/2 * Math.pow(2, 10 * (t - 1)) + b;
+		return c/2 * (-Math.pow(2, -10 * --t) + 2) + b;
+	},
+	easeInCirc: function(t, b, c, d) {
+		return -c * (Math.sqrt(1 - (t/=d)*t) - 1) + b;
+	},
+	easeOutCirc: function(t, b, c, d) {
+		return c * Math.sqrt(1 - (t=t/d-1)*t) + b;
+	},
+	easeInOutCirc: function(t, b, c, d) {
+		if ((t/=d/2) < 1) return -c/2 * (Math.sqrt(1 - t*t) - 1) + b;
+		return c/2 * (Math.sqrt(1 - (t-=2)*t) + 1) + b;
+	},
+	easeInElastic: function(t, b, c, d) {
+		var s=1.70158;var p=0;var a=c;
+		if (t==0) return b;  if ((t/=d)==1) return b+c;  if (!p) p=d*.3;
+		if (a < Math.abs(c)) { a=c; var s=p/4; }
+		else var s = p/(2*Math.PI) * Math.asin (c/a);
+		return -(a*Math.pow(2,10*(t-=1)) * Math.sin( (t*d-s)*(2*Math.PI)/p )) + b;
+	},
+	easeOutElastic: function(t, b, c, d) {
+		var s=1.70158;var p=0;var a=c;
+		if (t==0) return b;  if ((t/=d)==1) return b+c;  if (!p) p=d*.3;
+		if (a < Math.abs(c)) { a=c; var s=p/4; }
+		else var s = p/(2*Math.PI) * Math.asin (c/a);
+		return a*Math.pow(2,-10*t) * Math.sin( (t*d-s)*(2*Math.PI)/p ) + c + b;
+	},
+	easeInOutElastic: function(t, b, c, d) {
+		var s=1.70158;var p=0;var a=c;
+		if (t==0) return b;  if ((t/=d/2)==2) return b+c;  if (!p) p=d*(.3*1.5);
+		if (a < Math.abs(c)) { a=c; var s=p/4; }
+		else var s = p/(2*Math.PI) * Math.asin (c/a);
+		if (t < 1) return -.5*(a*Math.pow(2,10*(t-=1)) * Math.sin( (t*d-s)*(2*Math.PI)/p )) + b;
+		return a*Math.pow(2,-10*(t-=1)) * Math.sin( (t*d-s)*(2*Math.PI)/p )*.5 + c + b;
+	},
+	easeInBack: function(t, b, c, d, s) {
+		if (s == undefined) s = 1.70158;
+		return c*(t/=d)*t*((s+1)*t - s) + b;
+	},
+	easeOutBack: function(t, b, c, d, s) {
+		if (s == undefined) s = 1.70158;
+		return c*((t=t/d-1)*t*((s+1)*t + s) + 1) + b;
+	},
+	easeInOutBack: function(t, b, c, d, s) {
+		if (s == undefined) s = 1.70158; 
+		if ((t/=d/2) < 1) return c/2*(t*t*(((s*=(1.525))+1)*t - s)) + b;
+		return c/2*((t-=2)*t*(((s*=(1.525))+1)*t + s) + 2) + b;
+	},
+	easeOutBounce: function(t, b, c, d) {
+		if ((t/=d) < (1/2.75)) {
+			return c*(7.5625*t*t) + b;
+		} else if (t < (2/2.75)) {
+			return c*(7.5625*(t-=(1.5/2.75))*t + .75) + b;
+		} else if (t < (2.5/2.75)) {
+			return c*(7.5625*(t-=(2.25/2.75))*t + .9375) + b;
+		} else {
+			return c*(7.5625*(t-=(2.625/2.75))*t + .984375) + b;
+		}
+	},
+	linear: function(t, b, c, d) {
+		return (c-b)/d*t;
+	},
+	ease: function(t, b, c, d) {
+		if ((t/=d/2) < 1) return c/2*t*t + b;
+		return -c/2 * ((--t)*(t-2) - 1) + b;
+	}
+};

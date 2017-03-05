@@ -46,6 +46,7 @@ Events = {
 		Events.add('windowResize', window, 'resize', function() {
 			canvasDraw.clear();
 			canvasTurtle.clear();
+			canvasMG.clear();
 	        clearTimeout(windowResizeTimeout);
 	        windowResizeTimeout = setTimeout(function() {
 	        	var paused = itpr.pauseStart;
@@ -56,7 +57,11 @@ Events = {
 	            // set canvas sizes
 	            canvasDraw.setSize();
 	            canvasTurtle.setSize();
+	            if (mG.current) {
+	            	canvasMG.setSize();
+	            }
 	            
+	            mG.current.draw();
 	            itpr.redraw.rI();
 
 	            // restart if was running

@@ -58,6 +58,10 @@ function drawLogo() {
 
 var windowResizeTimeout = undefined;
 
+function test() {
+    var trace = new mG.trace();
+}
+
 (function() {
     // generate Shell
     shell = new Shell();
@@ -71,6 +75,10 @@ var windowResizeTimeout = undefined;
     turtle.set();
 
 	// generate a new canvas objects
+    // canvas: miniGames
+    canvasMG = new Canvas();
+    canvasMG.create();
+
     // canvas: draw
     canvasDraw = new Canvas();
     canvasDraw.create();
@@ -86,8 +94,6 @@ var windowResizeTimeout = undefined;
     draw.turtle(canvasTurtle);
 
     drawLogo();
-})();
 
-function test() {
-    var trace = miniGames.trace();
-}
+    //test();
+})();

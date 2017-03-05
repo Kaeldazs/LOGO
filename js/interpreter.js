@@ -19,12 +19,17 @@ var itpr = {
 			exec: function(percent) {
 				var move = itpr.buffer[0].args * percent;
 				var newPos = Math.rotate(0, 0, 0, -move, turtle.a);
+
 				if (percent == 1) {
 					var newPosX = turtle.x + newPos.x,
 						newPosY = turtle.y + newPos.y;
 					if (turtle.draw) {
 						draw.line(canvasDraw, turtle.x, turtle.y, newPosX, newPosY);
+						if (mG.current && mG.current.checkMove) {
+							mG.current.checkMove(turtle.x, turtle.y, newPosX, newPosY);
+						}
 					}
+
 					turtle.currentMoveX = 0;
 					turtle.currentMoveY = 0;
 					turtle.x = newPosX;
@@ -55,6 +60,9 @@ var itpr = {
 
 					if (turtle.draw) {
 						draw.line(canvasDraw, turtle.x, turtle.y, newPosX, newPosY);
+						if (mG.current && mG.current.checkMove) {
+							mG.current.checkMove(turtle.x, turtle.y, newPosX, newPosY);
+						}
 					}
 					turtle.currentMoveX = 0;
 					turtle.currentMoveY = 0;
@@ -298,6 +306,7 @@ var itpr = {
 	// reset all
 	clear: function(animate, callback) {
 		if (shell.clearCanvas) {
+			toolbar.btn.slow.click();
 			turtle.speed = turtle.speedInitial;
 			shell.clearCanvas = false;
 		}

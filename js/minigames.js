@@ -1,29 +1,32 @@
-miniGames = {
+mG = {
+	current: false,
+
 	trace: function() {
 		_this = this;
-		this.margin = 25;
-		this.checkMargin = 15;
-
+		this.lose = false;
+		this.win = false;
+		this.name = 'trace';
+		this.margin = 5;
+		this.checkMargin = 5;
+		mG.current = this;
+		this.checkpoints = undefined;
+		this.validPoints = [];
 		this.arr = [
 			[0, 0],
 			[0, -150],
-			[100, -150],
-			[150, 0],
-			[100, 100],
-			[0, 64],
-			[0, 120],
-			[150, 176],
-			[150, 220],
-			[-100, 220],
-			[-100, -150]
+			[100, -150]
 		];
 
-		this.lineTo = function(c, x, y, lx, ly) {
+		this.quit = function() {
+			mG.current = false;
+			itpr.clear(true);
+		};
+
+		this.dashTo = function(c, x, y, lx, ly, margin) {
 			var dots = [];
-			c.ctx.lineTo(x, y);
 			var dist = Math.distPoints(x, y, lx, ly);
 			var angle = Math.getAngle(x, y, lx, ly);
-			var nbPoints = Math.round(dist/_this.checkMargin);
+			var nbPoints = Math.round(dist/margin);
 			var segmentSize = dist/nbPoints;
 			var pos;
 			for (var i = 1; i <= nbPoints; i++) {
@@ -33,61 +36,106 @@ miniGames = {
 			return dots;
 		};
 
-		this.extremity = function(c, x, y) {
-			c.ctx.beginPath();
-			c.ctx.strokeStyle = 'rgba(120, 120, 255, 1)';
-			c.ctx.fillStyle = 'rgba(0, 0, 180, 1)';
-			c.ctx.lineWidth = 6;
-	 		c.ctx.arc(x, y, _this.margin, 0, 2 * Math.PI, false);
-	 		c.ctx.stroke();
-			c.ctx.fill();
+		this.extremity = function(c, x, y, color) {
+			canvasMG.ctx.beginPath();
+			canvasMG.ctx.strokeStyle = color;
+			canvasMG.ctx.fillStyle = 'rgba(0, 0, 180, 1)';
+			canvasMG.ctx.lineWidth = 6;
+	 		canvasMG.ctx.arc(x, y, _this.margin, 0, 2 * Math.PI, false);
+	 		canvasMG.ctx.stroke();
+			canvasMG.ctx.fill();
 		};
 
-		this.draw = function(c, arr) {
-			var lastDots = [arr[0][0], arr[0][1]];
-			var checkpoints = [[arr[0][0], arr[0][1]]];
-			c.ctx.save();
-			c.ctx.lineJoin = "round";
-			c.ctx.translate(c.cx - Math.round(turtle.width/2), c.cy - Math.round(turtle.height/2));
-
-
-			_this.extremity(c, arr[0][0], arr[0][1]);
-			_this.extremity(c, arr[arr.length - 1][0], arr[arr.length - 1][1]);
-
-
-			c.ctx.beginPath();
-			c.ctx.moveTo(arr[0][0], arr[0][1]);
-			for (var i = 1; i < arr.length; i++) {
-				checkpoints = checkpoints.concat(
-					_this.lineTo(c, arr[i][0], arr[i][1], lastDots[0], lastDots[1])
+		this.genCheckpoints = function() {
+			var lastDots = [this.arr[0][0], this.arr[0][1]];
+			this.checkpoints = [[this.arr[0][0], this.arr[0][1]]];
+			for (var i = 1; i < this.arr.length; i++) {
+				this.checkpoints = this.checkpoints.concat(
+					_this.dashTo(canvasMG, this.arr[i][0], this.arr[i][1], lastDots[0], lastDots[1], this.checkMargin)
 				);
-				lastDots = [arr[i][0], arr[i][1]];
+				lastDots = [this.arr[i][0], this.arr[i][1]];
+			}
+		}
+
+		this.checkMove = function(x, y, nx, ny) {
+			var dash = this.dashTo(canvasMG, x, y, nx, ny, this.margin/3);
+			var lose = true;
+			for (var d = 0; d < dash.length; d++) {
+				for (var i = 0; i < this.checkpoints.length; i++) {
+					if (dash[d][0] >= this.checkpoints[i][0] - this.margin &&
+						dash[d][0] <= this.checkpoints[i][0] + this.margin && 
+						dash[d][1] >= this.checkpoints[i][1] - this.margin &&
+						dash[d][1] <= this.checkpoints[i][1] + this.margin) {
+						if (!inArray(i, this.validPoints)) {
+							this.validPoints.push(i);
+							lose = false;
+						}
+					}
+				}
+				if (lose) break;
 			}
 
-			c.ctx.lineWidth = _this.margin * 2 + 6;
-			c.ctx.strokeStyle = 'rgba(120, 120, 255, 1)';
-			c.ctx.stroke();
-
-			c.ctx.lineWidth = _this.margin * 2;
-			c.ctx.strokeStyle = 'rgba(0, 0, 180, 1)';
-			c.ctx.stroke();
-
-			for (var i = 0; i < checkpoints.length; i++) {
-				c.ctx.beginPath();
-			    c.ctx.arc(checkpoints[i][0], checkpoints[i][1], 5, 0, 2 * Math.PI, false);
-			    c.ctx.fillStyle = 'rgba(120, 120, 255, 1)'; // rgba(0, 0, 120, 1)
-			    c.ctx.fill();
-			    c.ctx.beginPath();
-			    c.ctx.arc(checkpoints[i][0], checkpoints[i][1], _this.margin, 0, 2 * Math.PI, false);
-			    c.ctx.strokeStyle = 'rgba(120, 120, 255, 1)';
-			    c.ctx.lineWidth = 1 * c.pxRatio;
-			    c.ctx.stroke();
+			if (lose) {
+				this.lose = true;
+				this.draw();
 			}
-			c.ctx.restore();
+			else if (this.validPoints.length == this.checkpoints.length) {
+				this.win = true;
+				this.draw();
+			}
+		}
+
+		this.getColor = function() {
+			if (this.lose) {
+				return 'rgba(255, 120, 120, 1)';
+			}
+			else if (this.win) {
+				return 'rgba(20, 220, 20, 1)'
+			}
+			return 'rgba(120, 120, 255, 1)';
+		}
+
+		this.draw = function() {
+			canvasMG.clear();
+			var color = this.getColor();
+			var lastDots = [this.arr[0][0], this.arr[0][1]];
+			canvasMG.ctx.save();
+			canvasMG.ctx.lineJoin = "round";
+			canvasMG.ctx.translate(canvasMG.cx - Math.round(turtle.width/2), canvasMG.cy - Math.round(turtle.height/2));
+
+
+			_this.extremity(canvasMG, this.arr[0][0], this.arr[0][1], color);
+			_this.extremity(canvasMG, this.arr[this.arr.length - 1][0], this.arr[this.arr.length - 1][1], color);
+
+
+			canvasMG.ctx.beginPath();
+			canvasMG.ctx.moveTo(this.arr[0][0], this.arr[0][1]);
+			for (var i = 1; i < this.arr.length; i++) {
+				canvasMG.ctx.lineTo(this.arr[i][0], this.arr[i][1]);
+			}
+
+			canvasMG.ctx.lineWidth = _this.margin * 2 + 6;
+			canvasMG.ctx.strokeStyle = color;
+			canvasMG.ctx.stroke();
+
+			canvasMG.ctx.lineWidth = _this.margin * 2;
+			canvasMG.ctx.strokeStyle = 'rgba(0, 0, 180, 1)';
+			canvasMG.ctx.stroke();
+
+			for (var i = 0; i < this.checkpoints.length; i++) {
+			    canvasMG.ctx.beginPath();
+			    canvasMG.ctx.arc(this.checkpoints[i][0], this.checkpoints[i][1], _this.margin, 0, 2 * Math.PI, false);
+			    canvasMG.ctx.strokeStyle = 'rgba(0, 0, 0, 0.5)';
+			    canvasMG.ctx.lineWidth = 1 * canvasMG.pxRatio;
+			    canvasMG.ctx.stroke();
+			}
+
+			canvasMG.ctx.restore();
 		};
 
 		itpr.clear(true, function() {
-			_this.draw(canvasDraw, _this.arr);
+			_this.genCheckpoints();
+			_this.draw();
 		});
 	}
 }

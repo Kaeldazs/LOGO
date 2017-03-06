@@ -176,7 +176,7 @@ mG = {
 	            	this.stop();
 	            	canvasMG.el.style.opacity = '';
 
-					_this.drawCheckpoints(_this);
+					//_this.drawCheckpoints(_this);
 	            }
 			});
 		});

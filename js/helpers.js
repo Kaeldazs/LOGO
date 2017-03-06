@@ -57,3 +57,10 @@ function inArray(needle, haystack) {
     }
     return false;
 }
+
+inc = {
+    id: 0,
+    next: function() {
+        return this.id++;
+    }
+}

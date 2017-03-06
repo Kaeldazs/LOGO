@@ -371,13 +371,13 @@ var itpr = {
 	// interpreter controls
 	pause: function() {
 		animLoop.pause();
-		toolbar.btn.playPause.src = 'img/play.png';
 		itpr.pauseStart = Date.now();
+		toolbar.activeBtn(toolbar.btn.pause, 'active', '#toolbar .playPause.active');
 	},
 
 	play: function() {
 		animLoop.play();
-		toolbar.btn.playPause.src = 'img/pause.png';
+		if (animLoop.isRunning()) toolbar.activeBtn(toolbar.btn.play, 'active', '#toolbar .playPause.active');
 	},
 
 	toggle: function() {

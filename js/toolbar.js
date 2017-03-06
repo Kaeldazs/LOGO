@@ -47,12 +47,16 @@ Toolbar = function() {
 		});
 
 		_.genBtnImg('normal', 'img/normal.png', function() {
-			_.activeBtn(_.btn.normal, 6);
+			_.activeBtn(_.btn.normal, 5);
 		});
-		_.activeBtn(_.btn.normal, 6);
+		_.activeBtn(_.btn.normal, 5);
 
 		_.genBtnImg('fast', 'img/fast.png', function() {
 			_.activeBtn(_.btn.fast, 0);
+		});
+
+		_.genBtnImg('grid', 'img/grid.png', function() {
+			grid.canvas.el.style.opacity == 1 ? grid.hide() : grid.show();
 		});
 
 		document.body.appendChild(_.el);

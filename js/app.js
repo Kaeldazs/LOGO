@@ -32,6 +32,28 @@ var turtle = {
     }
 };
 
+var grid = {
+    active: false,
+    unit: 100,
+    canvas: undefined,
+    show: function() {
+        this.canvas.el.style.opacity = 1;
+    },
+    hide: function() {
+        this.canvas.el.style.opacity = 0;
+    },
+    draw: function() {
+        this.canvas.clear();
+        draw.grid(this.canvas);
+    },
+    create: function() {
+        this.canvas = new Canvas();
+        this.canvas.create();
+        this.canvas.el.style.opacity = 1;
+        this.draw();
+    }
+};
+
 // animation loop
 var animLoop = Kaylee.prepare(function() {
     // clear canvas
@@ -59,6 +81,7 @@ function drawLogo() {
 var windowResizeTimeout = undefined;
 
 function test() {
+    shell.history[shell.history.length] = 'REPETE 9 [AV 100 TD 100 AV 35 TD 100 AV 100 TG 160]';
     var trace = new mG.trace();
 }
 
@@ -79,6 +102,9 @@ function test() {
     canvasMG = new Canvas();
     canvasMG.create();
 
+    // canvas: grid
+    grid.create();
+
     // canvas: draw
     canvasDraw = new Canvas();
     canvasDraw.create();
@@ -95,5 +121,5 @@ function test() {
 
     drawLogo();
 
-    //test();
+    test();
 })();

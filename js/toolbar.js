@@ -17,6 +17,17 @@ Toolbar = function() {
 		});
 
 		_.genBtnImg({
+			src: 'img/first_step.png',
+			name: 'firstStep',
+			onclick: function() {
+				itpr.pause();
+				itpr.buffer = itpr.rI.concat(itpr.buffer);
+				itpr.rI = [];
+				itpr.redraw.rI();
+			}
+		});
+
+		_.genBtnImg({
 			src: 'img/back_step.png',
 			onclick: function() {
 				if (itpr.rI.length > 0) {

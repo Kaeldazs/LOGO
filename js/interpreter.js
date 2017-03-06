@@ -522,6 +522,7 @@ var itpr = {
 					else itpr.run(str);
 				}
 			}
+
 			if (str.length > 0 && !match && str[0] != ' ') {
 				console.error('La tortue n\'as pas réussi à comprendre ce que vous vouliez dire par "' + str + '" et s\'est donc arrêtée.');
 			}
@@ -583,6 +584,8 @@ var itpr = {
 			itpr.pause();
 			canvasDraw.clear();
 
+			mG.current.validPoints = [];
+
 			var tmpBuffer = itpr.buffer.slice(0);
 		    var tmprI = itpr.rI.slice(0);
 		    itpr.buffer = itpr.rI.slice(0);
@@ -602,7 +605,11 @@ var itpr = {
 	        itpr.buffer = tmpBuffer,
 	        itpr.rI = tmprI;
 
-	        mG.current.validPoints = [];
+	        if (mG.current) {
+	        	mG.current.win = mG.current.lose = false
+	        	mG.current.validPoints = [];
+	        	mG.current.draw();
+	        }
 
 	        canvasTurtle.clear();
 
@@ -612,7 +619,7 @@ var itpr = {
 		all: function() {
 			itpr.pause();
 
-			mG.current.validPoints = [];
+			if (mG.current) mG.current.validPoints = [];
 			itpr.buffer = itpr.rI.slice(0).concat(itpr.buffer.slice(0));
 
 			canvasDraw.clear();

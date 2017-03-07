@@ -3,6 +3,31 @@ Toolbar = function() {
 	this.height = 40;
 	this.btn = {};
 	this.el;
+
+	this.setInactive = function() {
+		if (itpr.rI.length > 0) {
+			if (this.btn.firstStep.classList.contains('inactive')) this.btn.firstStep.classList.remove('inactive');
+			if (this.btn.backStep.classList.contains('inactive')) this.btn.backStep.classList.remove('inactive');
+		}
+		else {
+			this.btn.firstStep.classList.add('inactive');
+			this.btn.backStep.classList.add('inactive');
+		}
+
+		if (itpr.buffer.length > 0) {
+			if (this.btn.play.classList.contains('inactive')) this.btn.play.classList.remove('inactive');
+			if (this.btn.stop.classList.contains('inactive')) this.btn.stop.classList.remove('inactive');
+			if (this.btn.nextStep.classList.contains('inactive')) this.btn.nextStep.classList.remove('inactive');
+			if (this.btn.lastStep.classList.contains('inactive')) this.btn.lastStep.classList.remove('inactive');
+		}
+		else {
+			this.btn.play.classList.add('inactive');
+			this.btn.stop.classList.add('inactive');
+			this.btn.nextStep.classList.add('inactive');
+			this.btn.lastStep.classList.add('inactive');
+		}
+	}
+
 	this.create = function() {
 		_.el = document.createElement('div');
 		_.el.id = 'toolbar';
@@ -13,6 +38,7 @@ Toolbar = function() {
 			src: 'img/clear.png',
 			onclick: function() {
 				itpr.clear(true);
+				toolbar.setInactive();
 			}
 		});
 
@@ -24,11 +50,13 @@ Toolbar = function() {
 				itpr.buffer = itpr.rI.concat(itpr.buffer);
 				itpr.rI = [];
 				itpr.redraw.rI();
+				toolbar.setInactive();
 			}
 		});
 
 		_.genBtnImg({
 			src: 'img/back_step.png',
+			name: 'backStep',
 			onclick: function() {
 				if (itpr.rI.length > 0) {
 					itpr.pause();
@@ -39,6 +67,7 @@ Toolbar = function() {
 					itpr.buffer[0].start = undefined;
 				}
 				itpr.play();
+				toolbar.setInactive();
 			}
 		});
 
@@ -48,6 +77,7 @@ Toolbar = function() {
 			name: 'play',
 			onclick: function() {
 				itpr.play();
+				toolbar.setInactive();
 			}
 		});
 
@@ -57,28 +87,35 @@ Toolbar = function() {
 			name: 'pause',
 			onclick: function() {
 				itpr.pause();
+				toolbar.setInactive();
 			}
 		});
 
 		_.genBtnImg({
 			src: 'img/stop.png',
+			name: 'stop',
 			onclick: function() {
 				itpr.stop();
+				toolbar.setInactive();
 			}
 		});
 
 		_.genBtnImg({
 			src: 'img/next_step.png',
+			name: 'nextStep',
 			onclick: function() {
 				itpr.interruption = 1;
 				itpr.play();
+				toolbar.setInactive();
 			}
 		});
 
 		_.genBtnImg({
 			src: 'img/last_step.png',
+			name: 'lastStep',
 			onclick: function() {
 				itpr.redraw.all();
+				toolbar.setInactive();
 			}
 		});
 		
@@ -86,8 +123,8 @@ Toolbar = function() {
 			src: 'img/slow.png',
 			name: 'slow',
 			class: 'speed',
-			onclick: function() {
-				_.activeBtn(this, 'active', '#toolbar .active.speed');
+			onclick: function(el) {
+				_.activeBtn(el, 'active', '#toolbar .active.speed');
 				itpr.speed(1);
 			}
 		});
@@ -96,8 +133,8 @@ Toolbar = function() {
 			name: 'normal',
 			src: 'img/normal.png',
 			class: 'speed',
-			onclick: function() {
-				_.activeBtn(this, 'active', '#toolbar .active.speed');
+			onclick: function(el) {
+				_.activeBtn(el, 'active', '#toolbar .active.speed');
 				itpr.speed(5);
 			}
 		});
@@ -106,8 +143,8 @@ Toolbar = function() {
 			name: 'fast',
 			src: 'img/fast.png',
 			class: 'speed',
-			onclick: function() {
-				_.activeBtn(this, 'active', '#toolbar .active.speed');
+			onclick: function(el) {
+				_.activeBtn(el, 'active', '#toolbar .active.speed');
 				itpr.speed(0);
 			}
 		});
@@ -116,19 +153,20 @@ Toolbar = function() {
 
 		_.genBtnImg({
 			src: 'img/grid.png',
-			class: 'grid active',
-			onclick: function() {
+			class: 'grid active right',
+			onclick: function(el) {
 				if (grid.canvas.el.style.opacity == 1) {
 					grid.hide();
-					this.classList.remove('active');
+					el.classList.remove('active');
 				}
 				else {
 					grid.show();
-					this.classList.add('active');
+					el.classList.add('active');
 				}
 			}
 		});
 		document.body.appendChild(_.el);
+		toolbar.setInactive();
 	}
 
 	_.genBtnImg = function(opt) {
@@ -138,7 +176,15 @@ Toolbar = function() {
 			_.btn[name].src = opt.src;
 			_.btn[name].style.marginTop = (_.height - 24)/2 + 'px';
 		}
-		if (opt.onclick) _.btn[name].onclick = opt.onclick;
+
+		if (opt.onclick) {
+			_.btn[name].onclick = function() {
+				if (!this.classList.contains('inactive')) {
+					opt.onclick(this);
+				}
+			}
+		}
+
 		if (opt.class) _.btn[name].className = opt.class;
 		_.btn[name].ondragstart = function(e) {
 			e.preventDefault();

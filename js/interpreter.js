@@ -365,7 +365,6 @@ var itpr = {
 	// which command is capturing user input
 	capture: false,
 
-	// animation is running ?
 	pauseStart: Date.now(),
 
 	// interpreter controls
@@ -389,7 +388,7 @@ var itpr = {
 			itpr.buffer.splice(0);
 		}
 		else {
-			itpr.buffer.splice(1, itpr.buffer.length - 1);
+			itpr.buffer.splice(1);
 		}
 	},
 
@@ -476,6 +475,8 @@ var itpr = {
 	    	// stop animation loop
 	    	itpr.pause();
 	    }
+
+	    toolbar.setInactive();
 	},
 
 	// interprete a string input

@@ -121,5 +121,5 @@ function test() {
 
     drawLogo();
 
-    test();
+    //test();
 })();

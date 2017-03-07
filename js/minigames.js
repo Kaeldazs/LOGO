@@ -168,6 +168,7 @@ mG = {
 			canvasMG.el.style.opacity = 0;
 			_this.genCheckpoints();
 			_this.draw();
+			toolbar.setInactive();
 			Kaylee.animate(function(start, curr) {
 				var percent = ((curr - start) / 300);
 	            percent = Kaylee.easing['ease'](percent, 0, 1, 1);

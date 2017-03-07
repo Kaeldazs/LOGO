@@ -61,6 +61,12 @@ canvas {
 	z-index: 999;
 }
 
+#toolbar .right {
+	float: right;
+	margin-left: 0;
+    margin-right: 14px;
+}
+
 #toolbar img {
 	opacity: 0.8;
 	margin-left: 14px;
@@ -71,4 +77,9 @@ canvas {
 #toolbar .active {
 	background: rgb(195, 195, 252);
 	box-shadow: 0 0 0 2px rgb(195, 195, 252), 0 0 0 3px rgb(0, 0, 240);
+}
+
+#toolbar .inactive {
+	opacity: 0.2;
+	cursor: default;
 }

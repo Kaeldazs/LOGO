@@ -10,13 +10,29 @@ var Shell = function() {
 		_this.shellMode.innerHTML = itpr.capture ? '> ' : '? ';
 	};
 
+	this.writeLine = function(commande, mode) {
+		var space = ' ';
+		if (!mode) {
+			space = '';
+			mode = '';
+		}
+    	_this.shellHistory.innerHTML = this.shellHistory.innerHTML + mode + space + commande + '<br>';
+	}
+
+	this.scrollBottom = function() {
+		_this.container.scrollTop = _this.container.scrollHeight;
+	};
+
 	this.create = function() {
 		_this.el = document.createElement('div');
 		_this.el.id = 'shell';
-		_this.el.style.height = _this.height + "px";
+		_this.el.className = 'shell';
+
+		_this.shellHistory = document.createElement('div');
+		_this.shellHistory.id = 'shell-history';
+		_this.shellHistory.className = 'shell';
 
 		_this.elLine = document.createElement('div');
-		_this.elLine.style.position = 'absolute';
 		_this.elLine.style.bottom = '14px';
 
 		_this.shellMode = document.createElement('span');
@@ -44,7 +60,15 @@ var Shell = function() {
 		_this.elLine.appendChild(_this.caret);
 
 		_this.el.appendChild(_this.elLine);
-		document.body.appendChild(_this.el);
+
+		_this.container = document.createElement('div');
+		_this.container.id = 'shell-container';
+		_this.container.style.height = _this.height + "px";
+
+		_this.container.appendChild(_this.shellHistory);
+		_this.container.appendChild(_this.el);
+
+		document.body.appendChild(_this.container);
 
 		this.shellInput = function() {
 			var val = _this.input.value;
@@ -81,6 +105,8 @@ var Shell = function() {
 					_this.history.shift();
 				}
 				var val = _this.input.value;
+				_this.writeLine(val, itpr.capture ? '>' : '?');
+				_this.scrollBottom();
 				_this.input.value = '';
 				_this.historyCursor = -1;
 
@@ -100,6 +126,13 @@ var Shell = function() {
 			else if (e.which == 67 && e.ctrlKey) {
 				_this.input.value = '';
 				_this.historyCursor = -1;
+				_this.scrollBottom();
+			}
+
+			// ctrl-L
+			else if (e.which == 76 && e.ctrlKey) {
+				_this.shellHistory.innerHTML = '';
+				_this.scrollBottom();
 			}
 
 			// arrow up
@@ -109,6 +142,7 @@ var Shell = function() {
 					_this.historyCursor += 1;
 					_this.input.value = _this.history[_this.history.length - _this.historyCursor - 1];
 				}
+				_this.scrollBottom();
 			}
 
 			// arrow down
@@ -123,6 +157,7 @@ var Shell = function() {
 				else {
 					_this.input.value = _this.history[_this.history.length - _this.historyCursor - 1];
 				}
+				_this.scrollBottom();
 			}
 
 			_this.caret.className = '';

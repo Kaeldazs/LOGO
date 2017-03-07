@@ -525,7 +525,7 @@ var itpr = {
 			}
 
 			if (str.length > 0 && !match && str[0] != ' ') {
-				console.error('La tortue n\'as pas réussi à comprendre ce que vous vouliez dire par "' + str + '" et s\'est donc arrêtée.');
+				shell.writeLine('<span class ="error">! La tortue n\'as pas réussi à comprendre ce que vous vouliez dire par "' + str + '" et s\'est donc arrêtée.</span>');
 			}
 		}
 		shell.setMode();

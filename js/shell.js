@@ -125,6 +125,7 @@ var Shell = function() {
 
 			// ctrl-C
 			else if (e.which == 67 && e.ctrlKey) {
+				_this.writeLine(_this.input.value, itpr.capture ? '>' : '?');
 				_this.input.value = '';
 				_this.historyCursor = -1;
 				_this.scrollBottom();

@@ -110,6 +110,8 @@ canvas {
     box-sizing: border-box;
     padding: 14px;
     overflow-y: scroll;
+    line-height: 1.4em;
+    font-size: 1em;
 }
 
 .shell {

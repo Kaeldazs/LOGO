@@ -10,14 +10,19 @@ var Shell = function() {
 		_this.shellMode.innerHTML = itpr.capture ? '> ' : '? ';
 	};
 
-	this.writeLine = function(commande, mode) {
+	this.writeLine = function(str, mode) {
 		var space = ' ';
 		if (!mode) {
 			space = '';
 			mode = '';
 		}
-    	_this.shellHistory.innerHTML = this.shellHistory.innerHTML + mode + space + commande + '<br>';
+    	_this.shellHistory.innerHTML = this.shellHistory.innerHTML + mode + space + str + '<br>';
     	_this.scrollBottom();
+	}
+
+	this.error = function(str) {
+		if (str.length > 15) str = str.substring(0, 30) + ' ... <span style="font-size:0.8em">(+'+ (str.length - 15) +' characters)</span>';
+		this.writeLine('<span class ="error">ERROR: '+ str +'</span>');
 	}
 
 	this.scrollBottom = function() {
@@ -98,36 +103,39 @@ var Shell = function() {
 
 			// enter
 			else if (e.which == 13) {
+				if (trimWhiteSpace(_this.input.value) != '') {
+					if (_this.input.value != '' && _this.history[_this.history.length - 1] != _this.input.value) {
+						_this.history[_this.history.length] = _this.input.value;
+					}
+					if (_this.history.length > this.historyMaxLen) {
+						_this.history.shift();
+					}
+					var val = _this.input.value;
+					_this.writeLine(val, itpr.capture ? '>' : '?');
+					_this.scrollBottom();
+					_this.input.value = '';
+					_this.historyCursor = -1;
 
-				if (_this.input.value != '' && _this.history[_this.history.length - 1] != _this.input.value) {
-					_this.history[_this.history.length] = _this.input.value;
-				}
-				if (_this.history.length > this.historyMaxLen) {
-					_this.history.shift();
-				}
-				var val = _this.input.value;
-				_this.writeLine(val, itpr.capture ? '>' : '?');
-				_this.scrollBottom();
-				_this.input.value = '';
-				_this.historyCursor = -1;
-
-				var func = function() {
-					var capture = itpr.run(val);
-				}
-				if (_this.clearCanvas) {
-					itpr.clear(true);
-					setTimeout(func, 400);
-				}
-				else {
-					func();
+					var func = function() {
+						var capture = itpr.run(val);
+					}
+					if (_this.clearCanvas) {
+						itpr.clear(true);
+						setTimeout(func, 400);
+					}
+					else {
+						func();
+					}
 				}
 			}
 
 			// ctrl-C
 			else if (e.which == 67 && e.ctrlKey) {
-				_this.writeLine(_this.input.value, itpr.capture ? '>' : '?');
+				if (trimWhiteSpace(_this.input.value) != '') {
+					_this.writeLine(_this.input.value, itpr.capture ? '>' : '?');
+					_this.historyCursor = -1;
+				}
 				_this.input.value = '';
-				_this.historyCursor = -1;
 				_this.scrollBottom();
 			}
 

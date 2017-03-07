@@ -43,6 +43,10 @@ function trimWhiteSpace(str) {
 	return str;
 }
 
+function escapeRegExp(str) {
+  return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+}
+
 function removeClassName(className, selector) {
     var els = document.querySelectorAll(selector);
     for (var i = 0; i < els.length; i++) {

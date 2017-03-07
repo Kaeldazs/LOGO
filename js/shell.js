@@ -17,6 +17,7 @@ var Shell = function() {
 			mode = '';
 		}
     	_this.shellHistory.innerHTML = this.shellHistory.innerHTML + mode + space + commande + '<br>';
+    	_this.scrollBottom();
 	}
 
 	this.scrollBottom = function() {

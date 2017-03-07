@@ -19,6 +19,7 @@ mG = {
 
 		this.quit = function() {
 			mG.current = false;
+			canvasMG.clear();
 			itpr.clear(true);
 		};
 

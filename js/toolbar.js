@@ -36,6 +36,7 @@ Toolbar = function() {
 
 		_.genBtnImg({
 			src: 'img/clear.png',
+			tooltip: 'clear',
 			onclick: function() {
 				itpr.clear(true);
 				toolbar.setInactive();
@@ -45,6 +46,7 @@ Toolbar = function() {
 		_.genBtnImg({
 			src: 'img/first_step.png',
 			name: 'firstStep',
+			tooltip: 'first step',
 			onclick: function() {
 				itpr.pause();
 				itpr.buffer = itpr.rI.concat(itpr.buffer);
@@ -57,6 +59,7 @@ Toolbar = function() {
 		_.genBtnImg({
 			src: 'img/back_step.png',
 			name: 'backStep',
+			tooltip: 'step backward',
 			onclick: function() {
 				if (itpr.rI.length > 0) {
 					itpr.pause();
@@ -75,6 +78,7 @@ Toolbar = function() {
 			class: 'playPause',
 			src: 'img/play.png',
 			name: 'play',
+			tooltip: 'play',
 			onclick: function() {
 				itpr.play();
 				toolbar.setInactive();
@@ -85,6 +89,7 @@ Toolbar = function() {
 			class: 'playPause',
 			src: 'img/pause.png',
 			name: 'pause',
+			tooltip: 'pause',
 			onclick: function() {
 				itpr.pause();
 				toolbar.setInactive();
@@ -94,6 +99,7 @@ Toolbar = function() {
 		_.genBtnImg({
 			src: 'img/stop.png',
 			name: 'stop',
+			tooltip: 'stop',
 			onclick: function() {
 				itpr.stop();
 				toolbar.setInactive();
@@ -103,6 +109,7 @@ Toolbar = function() {
 		_.genBtnImg({
 			src: 'img/next_step.png',
 			name: 'nextStep',
+			tooltip: 'step forward',
 			onclick: function() {
 				itpr.interruption = 1;
 				itpr.play();
@@ -113,6 +120,7 @@ Toolbar = function() {
 		_.genBtnImg({
 			src: 'img/last_step.png',
 			name: 'lastStep',
+			tooltip: 'last step',
 			onclick: function() {
 				itpr.redraw.all();
 				toolbar.setInactive();
@@ -123,6 +131,7 @@ Toolbar = function() {
 			src: 'img/slow.png',
 			name: 'slow',
 			class: 'speed',
+			tooltip: 'slow',
 			onclick: function(el) {
 				_.activeBtn(el, 'active', '#toolbar .active.speed');
 				itpr.speed(1);
@@ -133,6 +142,7 @@ Toolbar = function() {
 			name: 'normal',
 			src: 'img/normal.png',
 			class: 'speed',
+			tooltip: 'normal',
 			onclick: function(el) {
 				_.activeBtn(el, 'active', '#toolbar .active.speed');
 				itpr.speed(5);
@@ -143,6 +153,7 @@ Toolbar = function() {
 			name: 'fast',
 			src: 'img/fast.png',
 			class: 'speed',
+			tooltip: 'fast',
 			onclick: function(el) {
 				_.activeBtn(el, 'active', '#toolbar .active.speed');
 				itpr.speed(0);
@@ -154,6 +165,7 @@ Toolbar = function() {
 		_.genBtnImg({
 			src: 'img/grid.png',
 			class: 'grid active right',
+			tooltip: 'grid',
 			onclick: function(el) {
 				if (grid.canvas.el.style.opacity == 1) {
 					grid.hide();
@@ -190,6 +202,11 @@ Toolbar = function() {
 			e.preventDefault();
 		};
 		_.el.appendChild(_.btn[name]);
+		if (opt.tooltip) {
+			_.btn[name].onmouseover = function() {
+				tooltip(this, opt.tooltip);
+			}
+		}
 	};
 
 	_.activeBtn = function(el, remove, selector) {

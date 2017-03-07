@@ -106,7 +106,7 @@ mG = {
 		}
 
 		this.closePath = function(color) {
-			canvasMG.ctx.lineWidth = _this.margin * 2 + 6;
+			canvasMG.ctx.lineWidth = _this.margin * 2 + 12;
 			canvasMG.ctx.strokeStyle = color;
 			canvasMG.ctx.stroke();
 

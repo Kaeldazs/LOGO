@@ -131,6 +131,7 @@ var Shell = function() {
 
 			// ctrl-L
 			else if (e.which == 76 && e.ctrlKey) {
+				e.preventDefault();
 				_this.shellHistory.innerHTML = '';
 				_this.scrollBottom();
 			}

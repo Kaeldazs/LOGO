@@ -150,7 +150,7 @@ mG = {
 
 				for (var i = 0; i < this.arr.length; i++) {
 					if (i == 0 || i == this.arr.length - 1 || !this.arr[i+1]) {
-						_this.extremity(canvasMG, this.arr[i][0], this.arr[i][1], color);
+						_this.extremity(canvasMG, _this.arr[i][0], _this.arr[i][1], color);
 					}
 				}
 

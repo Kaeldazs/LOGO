@@ -321,8 +321,8 @@ var itpr = {
 		}
 		itpr.pause();
 
-		if (itpr.recursionTimeout) clearTimeout(itpr.recursionTimeout);
-		itpr.recursion = false;
+		itpr.tempCommands = '';
+		window.clearTimeout(itpr.temporisationTimeout);
 
 		itpr.buffer = [];
 		itpr.rI = [];
@@ -398,9 +398,7 @@ var itpr = {
 	},
 
 	stop: function() {
-		if (itpr.recursionTimeout) clearTimeout(itpr.recursionTimeout);
-		itpr.recursion = false;
-
+		window.clearTimeout(itpr.temporisationTimeout);
 		if (!animLoop.isRunning()) {
 			itpr.buffer.splice(0);
 		}
@@ -498,7 +496,13 @@ var itpr = {
 
 	// interprete a string input
 	run: function(str) {
-		try {
+		window.clearTimeout(itpr.temporisationTimeout);
+		itpr.temporisationTimeout = null;
+
+		str = itpr.tempCommands + ' ' + str;
+		itpr.tempCommands = '';
+
+		if (itpr.buffer.length <= 500 && !itpr.temporisationTimeout) {
 			str = trimWhiteSpace(str);
 			var match;
 			if (itpr.capture && itpr.commands[itpr.capture]) {
@@ -548,30 +552,33 @@ var itpr = {
 				}
 			}
 			shell.setMode();
-		} catch (e) {
-			itpr.recursion = true;
-			itpr.recursiveExec(str);
+		}
+		else {
+			itpr.tempCommands = str;
+			itpr.temporisedRun();
 		}
 	},
 
-	recursionTimeout: undefined,
-	recursion: false,
+	tempCommands: '',
+	temporisationTimeout: null,
 	checkIfRecursive: function(name) {
 		if (itpr.commands[name].buffer.match(new RegExp('(^|\\\s|\\\[)('+ escapeRegExp(name) +')($|\\\s|\\\])'))) {
 			shell.message("Pour comprendre le principe de récursivité, il faut d'abord comprendre le principe de récursivité.");
 		}
 	},
-	recursiveExec: function(str) {
-		if (itpr.buffer.length < 300) {
-			itpr.recursionTimeout = setTimeout(function() {
-				itpr.recursion = false;
-				itpr.run(str);
-			}, 500);
+
+	temporisedRun: function() {
+		if (itpr.buffer.length <= 500) {
+			itpr.temporisationTimeout = setTimeout(function() {
+				var cmd = itpr.tempCommands;
+				itpr.tempCommands = '';
+				itpr.run(cmd);
+			}, 1000);
 		}
 		else {
-			itpr.recursionTimeout = setTimeout(function() {
-				itpr.recursiveExec(str);
-			}, 500);
+			itpr.temporisationTimeout = setTimeout(function() {
+				itpr.temporisedRun();
+			}, 1000);
 		}
 	},
 

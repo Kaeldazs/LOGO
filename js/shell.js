@@ -154,12 +154,7 @@ var Shell = function() {
 					_this.input.value = _this.history.last();
 
 					var func = function() {
-						if (!itpr.recursion) {
-							var capture = itpr.run(val);
-						}
-						else {
-							shell.message("La commande sera executé après votre fonction récursive, soit jamais (mais vous pouvez appuyer sur \"gommer\" ou sur \"stop\").");
-						}
+						var capture = itpr.run(val);
 					}
 					if (_this.clearCanvas) {
 						itpr.clear(true);

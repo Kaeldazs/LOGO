@@ -621,7 +621,14 @@ var itpr = {
 				dump[dump.length] = [x, y];
 			}
 		}
-		console.log(JSON.stringify(dump));
+		
+		var output = JSON.stringify({
+			arr: dump,
+			margin: 10,
+			checkMargin: 10
+		});
+		console.log(output);
+		download('test2.logo', output);
 	},
 
 	redraw: {

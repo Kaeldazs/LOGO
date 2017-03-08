@@ -79,7 +79,7 @@ File = function() {
         // génération de l'input
         var input = document.createElement('input');
         input.type = 'file';
-        input.accept = "text/plain";
+        input.accept = ".logo, .LOGO";
         input.style.opacity = 0;
         input.style.filter='alpha(opacity=0)';
         input.style.position = 'absolute';
@@ -101,5 +101,20 @@ File = function() {
             }
             reader.readAsText(e.target.files[0]);
         }
+    }
+}
+
+function download(filename, text) {
+    var pom = document.createElement('a');
+    pom.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+    pom.setAttribute('download', filename);
+
+    if (document.createEvent) {
+        var event = document.createEvent('MouseEvents');
+        event.initEvent('click', true, true);
+        pom.dispatchEvent(event);
+    }
+    else {
+        pom.click();
     }
 }

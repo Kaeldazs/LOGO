@@ -1,8 +1,15 @@
 mG = {
 	current: false,
 
+	save: function() {
+		var name = prompt('Choisissez un nom');
+		if (name) download(name + '.logo', itpr.rI2MG());
+	},
+
 	trace: function(data) {
 		this.launch = function() {
+			shell.pushHistory('LC TG 90 AV 125 TD 90 RE 20 BC POUR f AV 40 TD 18 LC AV 40 TD 18 BC f FIN f');
+
 			this.lose = false;
 			this.win = false;
 			this.name = 'trace';

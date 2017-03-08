@@ -622,13 +622,11 @@ var itpr = {
 			}
 		}
 		
-		var output = JSON.stringify({
+		return JSON.stringify({
 			arr: dump,
 			margin: 10,
 			checkMargin: 10
 		});
-		console.log(output);
-		download('test2.logo', output);
 	},
 
 	redraw: {

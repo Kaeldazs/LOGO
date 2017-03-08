@@ -1,9 +1,40 @@
 var Shell = function() {
 	var _this = this;
 	this.height = 200;
-	this.history = [];
-	this.historyCursor = -1;
-	this.historyMaxLen = 100;
+
+	this.history = {
+		arr: [],
+		cursor: -1,
+		maxLen: 100,
+		push: function(str) {
+			if (str != '' && _this.history.arr[_this.history.arr.length - 1] != str) {
+				_this.history.arr[_this.history.arr.length] = str;
+				if (_this.history.arr.length > _this.history.maxLen) {
+					_this.history.arr.shift();
+				}
+			}
+		},
+		last: function() {
+			_this.history.cursor = -1;
+			return '';
+		},
+		prev: function() {
+			if (_this.history.cursor + 1 < _this.history.arr.length) {
+				_this.history.cursor += 1;
+			}
+			return _this.history.arr[_this.history.arr.length - _this.history.cursor - 1]
+		},
+		next: function() {
+			_this.history.cursor -= 1;
+			if (_this.history.cursor <= -1) {
+				return _this.history.last();
+			}
+			else {
+				return _this.history.arr[_this.history.arr.length - _this.history.cursor - 1];
+			}
+		}
+	};
+
 	this.clearCanvas = true;
 
 	this.setMode = function() {
@@ -27,7 +58,7 @@ var Shell = function() {
 	this.error = function(str, fullSize) {
 		if (!fullSize && str.length > 15) str = str.substring(0, 30) + '... <span style="font-size:0.8em">(+'+ (str.length - 15) +' characters)</span>';
 		this.writeLine('<span class ="error">ERROR: '+ str +'</span>');
-	}
+	};
 
 	this.scrollBottom = function() {
 		_this.container.scrollTop = _this.container.scrollHeight;
@@ -108,24 +139,19 @@ var Shell = function() {
 			// enter
 			else if (e.which == 13) {
 				if (trimWhiteSpace(_this.input.value) != '') {
-					if (_this.input.value != '' && _this.history[_this.history.length - 1] != _this.input.value) {
-						_this.history[_this.history.length] = _this.input.value;
-					}
-					if (_this.history.length > this.historyMaxLen) {
-						_this.history.shift();
-					}
+					_this.history.push(_this.input.value);
+
 					var val = _this.input.value;
 					_this.writeLine(val, itpr.capture ? '>' : '?');
 					_this.scrollBottom();
-					_this.input.value = '';
-					_this.historyCursor = -1;
+					_this.input.value = _this.history.last();
 
 					var func = function() {
 						if (!itpr.recursion) {
 							var capture = itpr.run(val);
 						}
 						else {
-							shell.message("La commande ne sera pas executé avant la fin de l'execution de votre fonction récursive. Bonne nuit !");
+							shell.message("La commande sera executé après votre fonction récursive. Bonne nuit ! (sinon appuyez sur la \"gomme\" ou sur \"stop\")");
 						}
 					}
 					if (_this.clearCanvas) {
@@ -142,9 +168,8 @@ var Shell = function() {
 			else if (e.which == 67 && e.ctrlKey) {
 				if (trimWhiteSpace(_this.input.value) != '') {
 					_this.writeLine(_this.input.value, itpr.capture ? '>' : '?');
-					_this.historyCursor = -1;
 				}
-				_this.input.value = '';
+				_this.input.value = _this.history.last();
 				_this.scrollBottom();
 			}
 
@@ -158,25 +183,14 @@ var Shell = function() {
 			// arrow up
 			else if (e.which == 38) {
 				e.preventDefault();
-				if (_this.historyCursor + 1 < _this.history.length) {
-					_this.historyCursor += 1;
-					_this.input.value = _this.history[_this.history.length - _this.historyCursor - 1];
-				}
+				_this.input.value = _this.history.prev();
 				_this.scrollBottom();
 			}
 
 			// arrow down
 			else if (e.which == 40) {
 				e.preventDefault();
-				_this.historyCursor -= 1;
-				if (_this.historyCursor <= -1) {
-					_this.input.value = '';
-					_this.historyCursor = -1;
-					_this.input.value = '';
-				}
-				else {
-					_this.input.value = _this.history[_this.history.length - _this.historyCursor - 1];
-				}
+				_this.input.value = _this.history.next();
 				_this.scrollBottom();
 			}
 

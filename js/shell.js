@@ -22,7 +22,8 @@ var Shell = function() {
 			if (_this.history.cursor + 1 < _this.history.arr.length) {
 				_this.history.cursor += 1;
 			}
-			return _this.history.arr[_this.history.arr.length - _this.history.cursor - 1]
+			var output = _this.history.arr[_this.history.arr.length - _this.history.cursor - 1];
+			return output ? output : '';
 		},
 		next: function() {
 			_this.history.cursor -= 1;
@@ -104,7 +105,7 @@ var Shell = function() {
 		_this.caret = document.createElement('span');
 		_this.caret.id = 'caret';
 		_this.caret.className = 'blink';
-		_this.caret.innerHTML = '_';
+		_this.caret.innerHTML = '&nbsp';
 		_this.caretPos.appendChild(_this.caret);
 
 		_this.el.appendChild(_this.elLine);

@@ -87,18 +87,25 @@ var Shell = function() {
 
 		_this.fakeInput = document.createElement('span');
 		_this.fakeInput.style.position = 'absolute';
+		_this.fakeInput.style.padding = '0 8px 8px 0';
+		_this.fakeInput.innerHTML = '&nbsp';
 		_this.elLine.appendChild(_this.fakeInput);
 
 		_this.caretPos = document.createElement('span');
-		_this.caretPos.style.position = 'relative';
-		_this.caretPos.style.opacity = 0;
+		_this.caretPos.style.position = 'absolute';
+		_this.caretPos.style.padding = '0 8px 8px 0';
 		_this.elLine.appendChild(_this.caretPos);
+
+		_this.caretPosText = document.createElement('span');
+		_this.caretPosText.style.opacity = 0;
+		_this.caretPosText.innerHTML = '&nbsp';
+		_this.caretPos.appendChild(_this.caretPosText);
 
 		_this.caret = document.createElement('span');
 		_this.caret.id = 'caret';
 		_this.caret.className = 'blink';
 		_this.caret.innerHTML = '_';
-		_this.elLine.appendChild(_this.caret);
+		_this.caretPos.appendChild(_this.caret);
 
 		_this.el.appendChild(_this.elLine);
 
@@ -113,8 +120,7 @@ var Shell = function() {
 
 		this.shellInput = function() {
 			var val = _this.input.value;
-			var regNbsp = new RegExp('\\\s', 'img');
-			_this.fakeInput.innerHTML = val.replace(regNbsp, '&nbsp');
+			_this.fakeInput.innerHTML = '&nbsp' + val;
 			var pos = 0;
 			if (document.selection) {
 				var selection = document.selection.createRange();
@@ -124,7 +130,7 @@ var Shell = function() {
 			else if (_this.input.selectionStart || _this.input.selectionStart == '0') {
 				pos = _this.input.selectionStart;
 			}
-			_this.caretPos.innerHTML = val.substring(0, pos).replace(regNbsp, '&nbsp');
+			_this.caretPosText.innerHTML = '&nbsp' + val.substring(0, pos);
 		}
 		_this.input.onkeyup = function(e) {
 			_this.caret.className = 'blink';
@@ -151,7 +157,7 @@ var Shell = function() {
 							var capture = itpr.run(val);
 						}
 						else {
-							shell.message("La commande sera executé après votre fonction récursive. Bonne nuit ! (sinon appuyez sur la \"gomme\" ou sur \"stop\")");
+							shell.message("La commande sera executé après votre fonction récursive, soit jamais (mais vous pouvez appuyer sur \"gommer\" ou sur \"stop\").");
 						}
 					}
 					if (_this.clearCanvas) {

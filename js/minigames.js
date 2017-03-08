@@ -3,8 +3,6 @@ mG = {
 
 	trace: function(data) {
 		this.launch = function() {
-			console.log('launched');
-			console.log(this.data);
 			this.lose = false;
 			this.win = false;
 			this.name = 'trace';
@@ -197,7 +195,6 @@ mG = {
 			file.open(function(data) {
 				_this.data = JSON.parse(data);
 				if (_this.data && _this.data.arr) {
-					console.log(_this);
 					_this.launch();
 				}
 			});

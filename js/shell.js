@@ -21,7 +21,7 @@ var Shell = function() {
 	}
 
 	this.error = function(str) {
-		if (str.length > 15) str = str.substring(0, 30) + ' ... <span style="font-size:0.8em">(+'+ (str.length - 15) +' characters)</span>';
+		if (str.length > 15) str = str.substring(0, 30) + '... <span style="font-size:0.8em">(+'+ (str.length - 15) +' characters)</span>';
 		this.writeLine('<span class ="error">ERROR: '+ str +'</span>');
 	}
 
@@ -117,7 +117,9 @@ var Shell = function() {
 					_this.historyCursor = -1;
 
 					var func = function() {
-						var capture = itpr.run(val);
+						if (!itpr.recursion) {
+							var capture = itpr.run(val);
+						}
 					}
 					if (_this.clearCanvas) {
 						itpr.clear(true);

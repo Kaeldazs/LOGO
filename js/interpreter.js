@@ -240,7 +240,7 @@ var itpr = {
 					itpr.commands[match[2] + ''] = {
 						type: 'function',
 						reg: new RegExp(regFunction),
-						buffer: [],
+						buffer: '',
 						localVar: args,
 						store: function(match) {
 							var commands = this.buffer;
@@ -310,6 +310,10 @@ var itpr = {
 			shell.clearCanvas = false;
 		}
 		itpr.pause();
+
+		if (itpr.recursionTimeout) clearTimeout(itpr.recursionTimeout);
+		itpr.recursion = false;
+
 		itpr.buffer = [];
 		itpr.rI = [];
 
@@ -384,6 +388,9 @@ var itpr = {
 	},
 
 	stop: function() {
+		if (itpr.recursionTimeout) clearTimeout(itpr.recursionTimeout);
+		itpr.recursion = false;
+
 		if (!animLoop.isRunning()) {
 			itpr.buffer.splice(0);
 		}
@@ -481,54 +488,81 @@ var itpr = {
 
 	// interprete a string input
 	run: function(str) {
-		str = trimWhiteSpace(str);
-		var match;
-		if (itpr.capture && itpr.commands[itpr.capture]) {
-			match = str.match(/^([^F]|F[^I]|FI[^N])+/g) || [''];
-			var fin = str.match(/(FIN)/g);
-			if (fin) {
-				itpr.commands[itpr.capture].buffer = trimWhiteSpace(itpr.commands[itpr.capture].buffer + ' ' + match[0]);
-				str = str.replace(match[0], '');
-				itpr.capture = false;
-				itpr.run(str);
-			}
-			else {
-				itpr.commands[itpr.capture].buffer = trimWhiteSpace(itpr.commands[itpr.capture].buffer + ' ' + str);
-			}
-		}
-		else {
-			var bracket, j;
-			for (var i in this.commands) {
-				match = str.match(this.commands[i].reg);
-				if (match) {
-					if (match[1] == 'REPETE') {
-						bracket = 1;
-						j = match[0].length - 1;
-						while (bracket > 0 && j < str.length) {
-							j++;
-							if (str[j] == '[') bracket++;
-							else if (str[j] == ']') bracket--;
-						}
-						match = ['REPETE', match[2], str.substring(match[0].length, j)];
-						str = str.slice(j + 1);
-					}
-					else {
-						str = str.replace(match[0], '');
-					}
-					var store;
-					this.commands[i].store ? store = this.commands[i].store(match) : itpr.store(match);
-					if (store) {
-						itpr.run(store + str);
-					}
-					else itpr.run(str);
+		try {
+			str = trimWhiteSpace(str);
+			var match;
+			if (itpr.capture && itpr.commands[itpr.capture]) {
+				match = str.match(/^([^F]|F[^I]|FI[^N])+/g) || [''];
+				var fin = str.match(/(FIN)/g);
+				if (fin) {
+					itpr.commands[itpr.capture].buffer = trimWhiteSpace(itpr.commands[itpr.capture].buffer + ' ' + match[0]);
+					str = str.replace(match[0], '');
+					itpr.checkIfRecursive(itpr.capture);
+					itpr.capture = false;
+					itpr.run(str);
+				}
+				else {
+					itpr.commands[itpr.capture].buffer = trimWhiteSpace(itpr.commands[itpr.capture].buffer + ' ' + str);
 				}
 			}
+			else {
+				var bracket, j;
+				for (var i in this.commands) {
+					match = str.match(this.commands[i].reg);
+					if (match) {
+						if (match[1] == 'REPETE') {
+							bracket = 1;
+							j = match[0].length - 1;
+							while (bracket > 0 && j < str.length) {
+								j++;
+								if (str[j] == '[') bracket++;
+								else if (str[j] == ']') bracket--;
+							}
+							match = ['REPETE', match[2], str.substring(match[0].length, j)];
+							str = str.slice(j + 1);
+						}
+						else {
+							str = str.replace(match[0], '');
+						}
+						var store;
+						this.commands[i].store ? store = this.commands[i].store(match) : itpr.store(match);
+						if (store) {
+							itpr.run(store + str);
+						}
+						else itpr.run(str);
+					}
+				}
 
-			if (str.length > 0 && !match && str[0] != ' ') {
-				shell.error(str);
+				if (str.length > 0 && !match && str[0] != ' ') {
+					shell.error(str);
+				}
 			}
+			shell.setMode();
+		} catch (e) {
+			itpr.recursion = true;
+			itpr.recursiveExec(str);
 		}
-		shell.setMode();
+	},
+
+	recursionTimeout: undefined,
+	recursion: false,
+	checkIfRecursive: function(name) {
+		if (itpr.commands[name].buffer.match(new RegExp('(^|\\\s|\\\[)('+ escapeRegExp(name) +')($|\\\s|\\\])'))) {
+			shell.writeLine("<span style=\"color:white\">Pour comprendre le principe de récursivité, il faut d'abord comprendre le principe de récursivité.</span>");
+		}
+	},
+	recursiveExec: function(str) {
+		if (itpr.buffer.length < 300) {
+			itpr.recursionTimeout = setTimeout(function() {
+				itpr.recursion = false;
+				itpr.run(str);
+			}, 500);
+		}
+		else {
+			itpr.recursionTimeout = setTimeout(function() {
+				itpr.recursiveExec(str);
+			}, 500);
+		}
 	},
 
 	iR2MG: function() {

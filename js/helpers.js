@@ -68,3 +68,38 @@ inc = {
         return this.id++;
     }
 }
+
+File = function() {
+    _ = this;
+
+    this.data = undefined;
+
+    // ouverture d'un fichier
+    this.open = function(callback) {
+        // génération de l'input
+        var input = document.createElement('input');
+        input.type = 'file';
+        input.accept = "text/plain";
+        input.style.opacity = 0;
+        input.style.filter='alpha(opacity=0)';
+        input.style.position = 'absolute';
+        input.onchange = function(e) {
+            _.read(e, callback);
+        };
+        input.click();
+    };
+
+    //lecture d'un fichier
+    this.read = function(e, callback) {
+        if (e.target.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function(e) { 
+                _.data = e.target.result;
+                if (callback) {
+                    callback(_.data);
+                }
+            }
+            reader.readAsText(e.target.files[0]);
+        }
+    }
+}

@@ -189,7 +189,9 @@ var itpr = {
 					turtle.opacity = 0;
 				}
 				else {
-					turtle.opacity = 1 - percent;
+					if (turtle.opacity !== 0) {
+						turtle.opacity = 1 - percent;
+					}
 				}
 			}
 		},
@@ -203,7 +205,9 @@ var itpr = {
 					turtle.opacity = 1;
 				}
 				else {
-					turtle.opacity = percent;
+					if (turtle.opacity !== 1) {
+						turtle.opacity = percent;
+					}
 				}
 			}
 		},
@@ -226,34 +230,39 @@ var itpr = {
 			reg: /^(POUR)\s([^\s]+)(?:\s:(?:[a-zA-Z0-9_$]+))*/,
 			doc: '',
 			store: function(match) {
-				if (!itpr.capture && !inArray(match[2], itpr.primitives)) {
-					var argsRegex = /(\s:([a-zA-Z0-9_$]+))/g;
-					var args = match[0].match(argsRegex);
-					var regVar = '(?:'+ match[2] +')';
-					var regFunction = '^(' + match[2] + ')';
-					for (var i in args) {
-						args[i] = args[i].replace(/^\s/g, '');
+				if (!inArray(match[2], itpr.primitives)) {
+					if (!itpr.capture) {
+						var argsRegex = /(\s:([a-zA-Z0-9_$]+))/g;
+						var args = match[0].match(argsRegex);
+						var regVar = '(?:'+ match[2] +')';
+						var regFunction = '^(' + match[2] + ')';
+						for (var i in args) {
+							args[i] = args[i].replace(/^\s/g, '');
 
-						regVar += '(?:\\\s(\\\d+))';
-						regFunction += '(?:\\\s(\\\d+))';
-					}
-					itpr.commands[match[2] + ''] = {
-						type: 'function',
-						reg: new RegExp(regFunction),
-						buffer: '',
-						localVar: args,
-						store: function(match) {
-							var commands = this.buffer;
-							if (this.localVar) {
-								for (var j = 0; j < this.localVar.length; j++) {
-									var r = new RegExp('(^|\\\s|\\\[)(?:'+ this.localVar[j] +')($|\\\s|\\\])', 'g');
-									commands = commands.replace(r, "$1"+ match[j+2] +"$2");
-								}
-							}
-							return commands;
+							regVar += '(?:\\\s(\\\d+))';
+							regFunction += '(?:\\\s(\\\d+))';
 						}
+						itpr.commands[match[2] + ''] = {
+							type: 'function',
+							reg: new RegExp(regFunction),
+							buffer: '',
+							localVar: args,
+							store: function(match) {
+								var commands = this.buffer;
+								if (this.localVar) {
+									for (var j = 0; j < this.localVar.length; j++) {
+										var r = new RegExp('(^|\\\s|\\\[)(?:'+ this.localVar[j] +')($|\\\s|\\\])', 'g');
+										commands = commands.replace(r, "$1"+ match[j+2] +"$2");
+									}
+								}
+								return commands;
+							}
+						}
+						itpr.capture = match[2] + '';
 					}
-					itpr.capture = match[2] + '';
+				}
+				else {
+					shell.error('La fonction "'+ match[2] +'" ne peut être remplacée.', true);
 				}
 			}
 		},
@@ -291,6 +300,7 @@ var itpr = {
 		}
 		// sinon, insertion de l'instruction dans le buffer
 		else {
+
 			itpr.buffer[itpr.buffer.length] = {
 				instruction: match[1],
 				args: match[2],
@@ -548,7 +558,7 @@ var itpr = {
 	recursion: false,
 	checkIfRecursive: function(name) {
 		if (itpr.commands[name].buffer.match(new RegExp('(^|\\\s|\\\[)('+ escapeRegExp(name) +')($|\\\s|\\\])'))) {
-			shell.writeLine("<span style=\"color:white\">Pour comprendre le principe de récursivité, il faut d'abord comprendre le principe de récursivité.</span>");
+			shell.message("Pour comprendre le principe de récursivité, il faut d'abord comprendre le principe de récursivité.");
 		}
 	},
 	recursiveExec: function(str) {
@@ -565,7 +575,7 @@ var itpr = {
 		}
 	},
 
-	iR2MG: function() {
+	rI2MG: function() {
 		var x = y = a = 0;
 		var d = true;
 		var dump = [];

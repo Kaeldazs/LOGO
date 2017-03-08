@@ -20,8 +20,12 @@ var Shell = function() {
     	_this.scrollBottom();
 	}
 
-	this.error = function(str) {
-		if (str.length > 15) str = str.substring(0, 30) + '... <span style="font-size:0.8em">(+'+ (str.length - 15) +' characters)</span>';
+	this.message = function(str) {
+		this.writeLine("<span style=\"color:white\">" + str + "</span>");
+	};
+
+	this.error = function(str, fullSize) {
+		if (!fullSize && str.length > 15) str = str.substring(0, 30) + '... <span style="font-size:0.8em">(+'+ (str.length - 15) +' characters)</span>';
 		this.writeLine('<span class ="error">ERROR: '+ str +'</span>');
 	}
 
@@ -119,6 +123,9 @@ var Shell = function() {
 					var func = function() {
 						if (!itpr.recursion) {
 							var capture = itpr.run(val);
+						}
+						else {
+							shell.message("La commande ne sera pas executé avant la fin de l'execution de votre fonction récursive. Bonne nuit !");
 						}
 					}
 					if (_this.clearCanvas) {

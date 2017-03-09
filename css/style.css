@@ -122,6 +122,7 @@ canvas {
     padding: 7px;
     overflow-y: scroll;
     line-height: 18px;
+    white-space: pre;
     font-size: 14px;
     font-family: 'bitstream_vera_sans_monoroman';
 }

@@ -89,7 +89,6 @@ var Shell = function() {
 		_this.fakeInput = document.createElement('span');
 		_this.fakeInput.style.position = 'absolute';
 		_this.fakeInput.style.padding = '0 8px 8px 0';
-		_this.fakeInput.innerHTML = '&nbsp';
 		_this.elLine.appendChild(_this.fakeInput);
 
 		_this.caretPos = document.createElement('span');
@@ -99,7 +98,6 @@ var Shell = function() {
 
 		_this.caretPosText = document.createElement('span');
 		_this.caretPosText.style.opacity = 0;
-		_this.caretPosText.innerHTML = '&nbsp';
 		_this.caretPos.appendChild(_this.caretPosText);
 
 		_this.caret = document.createElement('span');
@@ -121,7 +119,7 @@ var Shell = function() {
 
 		this.shellInput = function() {
 			var val = _this.input.value;
-			_this.fakeInput.innerHTML = '&nbsp' + val;
+			_this.fakeInput.innerHTML = val;
 			var pos = 0;
 			if (document.selection) {
 				var selection = document.selection.createRange();
@@ -131,12 +129,14 @@ var Shell = function() {
 			else if (_this.input.selectionStart || _this.input.selectionStart == '0') {
 				pos = _this.input.selectionStart;
 			}
-			_this.caretPosText.innerHTML = '&nbsp' + val.substring(0, pos);
-		}
+			_this.caretPosText.innerHTML = val.substring(0, pos);
+		};
+
 		_this.input.onkeyup = function(e) {
 			_this.caret.className = 'blink';
 			_this.shellInput();
-		}
+		};
+
 		_this.input.onkeydown = function(e) {
 			// echap
 			if (e.which == 27) {
@@ -198,10 +198,12 @@ var Shell = function() {
 
 			_this.caret.className = '';
 			_this.shellInput();
-		}
+		};
+
 		window.onclick = function(e) {
 			_this.input.focus();
-		}
+		};
+
 		_this.input.focus();
 	};
 };

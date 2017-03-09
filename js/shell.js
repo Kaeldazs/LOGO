@@ -115,6 +115,8 @@ var Shell = function() {
 		_this.container.appendChild(_this.shellHistory);
 		_this.container.appendChild(_this.el);
 
+		this.setSize();
+
 		document.body.appendChild(_this.container);
 
 		this.shellInput = function() {
@@ -205,5 +207,9 @@ var Shell = function() {
 		};
 
 		_this.input.focus();
+	};
+
+	this.setSize = function() {
+		_this.container.style.width = (window.innerWidth - menu.width) + 'px';
 	};
 };

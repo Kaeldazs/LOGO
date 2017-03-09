@@ -48,6 +48,8 @@ Events = {
 			canvasTurtle.clear();
 			canvasMG.clear();
 			grid.canvas.clear();
+			shell.setSize();
+			toolbar.setSize();
 	        clearTimeout(windowResizeTimeout);
 	        windowResizeTimeout = setTimeout(function() {
 	        	var paused = itpr.pauseStart;

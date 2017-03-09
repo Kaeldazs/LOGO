@@ -86,6 +86,9 @@ function test() {
 }
 
 (function() {
+    // generate menu
+    menu = new Menu();
+
     // generate Shell
     shell = new Shell();
     shell.create();

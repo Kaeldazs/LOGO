@@ -28,11 +28,16 @@ Toolbar = function() {
 		}
 	}
 
+	this.setSize = function() {
+		_.el.style.width = (window.innerWidth - menu.width) + 'px';
+	}
+
 	this.create = function() {
 		_.el = document.createElement('div');
 		_.el.id = 'toolbar';
 		_.el.style.bottom = shell.height + 'px';
 		_.el.style.height = _.height + 'px';
+		this.setSize();
 
 		_.genBtnImg({
 			src: 'img/clear.png',

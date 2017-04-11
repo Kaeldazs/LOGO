@@ -14,6 +14,15 @@ var Shell = function() {
 				}
 			}
 		},
+		getJSON: function() {
+			return JSON.stringify(_this.history.arr);
+		},
+		setLocalStorage: function() {
+			var temp = localStorage.getItem('history');
+			if (temp) {
+				_this.history.arr = _this.history.arr.concat(JSON.parse(temp));
+			}
+		},
 		last: function() {
 			_this.history.cursor = -1;
 			return '';
@@ -35,6 +44,8 @@ var Shell = function() {
 			}
 		}
 	};
+
+	this.history.setLocalStorage();
 
 	this.clearCanvas = true;
 
@@ -149,6 +160,7 @@ var Shell = function() {
 			else if (e.which == 13) {
 				if (trimWhiteSpace(_this.input.value) != '') {
 					_this.history.push(_this.input.value);
+					localStorage.setItem("history", _this.history.getJSON());
 
 					var val = _this.input.value;
 					_this.writeLine(val, itpr.capture ? '>' : '?');

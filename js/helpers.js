@@ -83,8 +83,10 @@ File = function() {
         input.style.opacity = 0;
         input.style.filter='alpha(opacity=0)';
         input.style.position = 'absolute';
+        input.value = '';
         input.onchange = function(e) {
             _.read(e, callback);
+            input.value = '';
         };
         input.click();
     };

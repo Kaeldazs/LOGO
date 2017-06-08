@@ -80,11 +80,6 @@ function drawLogo() {
 
 var windowResizeTimeout = undefined;
 
-function test() {
-    shell.history[shell.history.length] = 'REPETE 9 [AV 100 TD 100 AV 35 TD 100 AV 100 TG 160]';
-    var trace = new mG.trace();
-}
-
 (function() {
     // generate menu
     menu = new Menu();

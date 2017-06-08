@@ -13,7 +13,10 @@ var itpr = {
 		AV: {
 			type: 'procedure',
 			reg: /^(AV)\s(-?[0-9]+(?:\.[0-9]+)?|:([a-zA-Z0-9_$]+))/,
-			doc: 'AV pixels // The turtle moves pixels foward',
+			doc: {
+				synthax: 'AV pixels',
+				description: 'The turtle moves pixels forward'
+			},
 			duration: function() { return turtle.speed },
 			easing: 'ease',
 			exec: function(percent) {
@@ -46,7 +49,10 @@ var itpr = {
 		RE: {
 			type: 'procedure',
 			reg: /^(RE)\s(-?[0-9]+(?:\.[0-9]+)?|:([a-zA-Z0-9_$]+))/,
-			doc: 'RE pixels // The turtle moves pixels backward',
+			doc: {
+				synthax: 'RE pixels',
+				description: 'The turtle moves pixels backward'
+			},
 			duration: function() { return turtle.speed },
 			easing: 'ease',
 			exec: function(percent) {
@@ -80,7 +86,10 @@ var itpr = {
 		TD: {
 			type: 'procedure',
 			reg: /^(TD)\s(-?[0-9]+(?:\.[0-9]+)?|:([a-zA-Z0-9_$]+))/,
-			doc: 'TD degrees // The turtle turns degrees to the right',
+			doc: {
+				synthax: 'TD degrees',
+				description: 'The turtle turns degrees to the right'
+			},
 			easing: 'ease',
 			duration: function() { return turtle.speed },
 			exec: function(percent) {
@@ -100,7 +109,10 @@ var itpr = {
 		TG: {
 			type: 'procedure',
 			reg: /^(TG)\s(-?[0-9]+(?:\.[0-9]+)?|:([a-zA-Z0-9_$]+))/,
-			doc: 'TG degrees // The turtle turns degrees to the left',
+			doc: {
+				synthax: 'TG degrees',
+				description: 'The turtle turns degrees to the left'
+			},
 			easing: 'ease',
 			duration: function() { return turtle.speed },
 			exec: function(percent) {
@@ -117,7 +129,10 @@ var itpr = {
 		FCC: {
 			type: 'procedure',
 			reg: /^(FCC)\s(#([[0-9A-Fa-f]{6}|[[0-9A-Fa-f]{3}))/,
-			doc: 'FCC color // Change the trace color to color in RGB format as #FF0000 for red',
+			doc: {
+				synthax: 'FCC color',
+				description: 'Change the trace color to color in RGB format as #FF0000 for red'
+			},
 			easing: 'ease',
 			duration: function() { return turtle.speed },
 			exec: function(percent) {
@@ -138,7 +153,10 @@ var itpr = {
 		LC: {
 			type: 'procedure',
 			reg: /^(LC)/,
-			doc: 'LC // Pen up (no trace)',
+			doc: {
+				synthax: 'LC',
+				description: 'Pen up (no trace)'
+			},
 			duration: function() { return turtle.speed },
 			exec: function(percent) {
 				var move = -itpr.buffer[0].args * percent;
@@ -156,7 +174,10 @@ var itpr = {
 		BC: {
 			type: 'procedure',
 			reg: /^(BC)/,
-			doc: 'BC // Pen down (trace active)',
+			doc: {
+				synthax: 'BC',
+				description: 'Pen down (trace active)'
+			},
 			duration: function() { return turtle.speed },
 			exec: function(percent) {
 				var move = -itpr.buffer[0].args * percent;
@@ -174,7 +195,10 @@ var itpr = {
 		VE: {
 			type: 'procedure',
 			reg: /^(VE)/,
-			doc: 'VE // Clears the screen and put the turtle at the center, facing upwards',
+			doc: {
+				synthax: 'VE',
+				description: 'Clears the screen and put the turtle at the center, facing upwards'
+			},
 			exec: function(percent) {
 				itpr.clear(true);
 			}
@@ -182,7 +206,10 @@ var itpr = {
 		CT: {
 			type: 'procedure',
 			reg: /^(CT)/,
-			doc: 'CT // Hide the turtle',
+			doc: {
+				synthax: 'CT',
+				description: 'Hide the turtle'
+			},
 			duration: function() { return turtle.speed },
 			exec: function(percent) {
 				if (percent == 1) {
@@ -198,7 +225,10 @@ var itpr = {
 		MT: {
 			type: 'procedure',
 			reg: /^(MT)/,
-			doc: 'MT // Show the turtle',
+			doc: {
+				synthax: 'MT',
+				description: 'Show the turtle'
+			},
 			duration: function() { return turtle.speed },
 			exec: function(percent) {
 				if (percent == 1) {
@@ -214,7 +244,10 @@ var itpr = {
 		REPETE: {
 			type: 'structure',
 			reg: /^(REPETE)\s([0-9]+|:[a-zA-Z0-9_$]+)\s\[/,
-			doc: 'REPETE x [commands] // Do the commands x times',
+			doc: {
+				synthax: 'REPETE x [commands]',
+				description: 'Do the commands x times'
+			},
 			store: function(match) {
 				var iterations = match[1];
 				var commands = match[2];
@@ -228,7 +261,10 @@ var itpr = {
 		POUR: {
 			type: 'function',
 			reg: /^(POUR)\s([^\s]+)(?:\s:(?:[a-zA-Z0-9_$]+))*/,
-			doc: '',
+			doc: {
+				synthax: 'POUR funcName :variable[ :variable2 ...]',
+				description: 'Function definition'
+			},
 			store: function(match) {
 				if (!inArray(match[2], itpr.primitives)) {
 					if (!itpr.capture) {
@@ -269,7 +305,10 @@ var itpr = {
 		FIN: {
 			type: 'procedure',
 			reg: /^(FIN)/,
-			doc: 'FIN // End of capture',
+			doc: {
+				synthax: 'FIN',
+				description: 'End of function'
+			},
 			store: function(match) {
 				itpr.capture = false
 			}
@@ -633,7 +672,7 @@ var itpr = {
 			arr: dump,
 			margin: 10,
 			checkMargin: 10
-		});
+		}, null, "\t");
 	},
 
 	redraw: {

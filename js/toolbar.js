@@ -7,11 +7,11 @@ Toolbar = function() {
 	this.setInactive = function() {
 		if (itpr.rI.length > 0) {
 			if (this.btn.firstStep.classList.contains('inactive')) this.btn.firstStep.classList.remove('inactive');
-			if (this.btn.backStep.classList.contains('inactive')) this.btn.backStep.classList.remove('inactive');
+			//if (this.btn.backStep.classList.contains('inactive')) this.btn.backStep.classList.remove('inactive');
 		}
 		else {
 			this.btn.firstStep.classList.add('inactive');
-			this.btn.backStep.classList.add('inactive');
+			//this.btn.backStep.classList.add('inactive');
 		}
 
 		if (itpr.buffer.length > 0) {
@@ -61,7 +61,7 @@ Toolbar = function() {
 			}
 		});
 
-		_.genBtnImg({
+		/*_.genBtnImg({
 			src: 'img/back_step.png',
 			name: 'backStep',
 			tooltip: 'étape précédente',
@@ -77,7 +77,7 @@ Toolbar = function() {
 				itpr.play();
 				toolbar.setInactive();
 			}
-		});
+		});*/
 
 		_.genBtnImg({
 			class: 'playPause',
@@ -182,6 +182,25 @@ Toolbar = function() {
 				}
 			}
 		});
+		
+		_.genBtnImg({
+			src: 'img/save.png',
+			class: 'right',
+			tooltip: 'sauver le tracé',
+			onclick: function(el) {
+				mG.save();
+			}
+		});
+
+		_.genBtnImg({
+			src: 'img/import.png',
+			class: 'right',
+			tooltip: 'importer',
+			onclick: function(el) {
+				new mG.trace();
+			}
+		});
+
 		document.body.appendChild(_.el);
 		toolbar.setInactive();
 	}

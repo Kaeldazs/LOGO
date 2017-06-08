@@ -5,7 +5,7 @@ var Shell = function() {
 	this.history = {
 		arr: [],
 		cursor: -1,
-		maxLen: 100,
+		maxLen: 50,
 		push: function(str) {
 			if (str != '' && _this.history.arr[_this.history.arr.length - 1] != str) {
 				_this.history.arr[_this.history.arr.length] = str;
